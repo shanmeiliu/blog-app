@@ -66,3 +66,13 @@ body {
   cursor: pointer;
   color: blue;
 }
+.post-view h1 { font-size: 28px; }
+.post-view h2 { font-size: 24px; }
+.post-view p { line-height: 1.6; }
+.post-view img { max-width: 100%; }
+.post-view pre {
+  background: #111;
+  color: #eee;
+  padding: 12px;
+  overflow-x: auto;
+}
