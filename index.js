@@ -54,9 +54,13 @@ function renderPostList(list) {
     });
 }
 function renderPostCard(post) {
+    const thumb = `./thumbs/${post.filename.replace(".md", ".png")}`;
     return `
     <div class="post-card" id="${post.filename}">
-      <img src="./thumbs/${post.filename.replace(".md", ".png")}" />
+      <img 
+        src="${thumb}" 
+        onerror="this.onerror=null; this.src='./thumbs/default.png';"
+      />
       <div>
         <h3>${post.title}</h3>
         <div class="post-meta">
