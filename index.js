@@ -2,6 +2,7 @@ import { posts } from "./manifest.js";
 const content = document.getElementById("content");
 const searchInput = document.getElementById("search");
 let debounceTimer;
+const normalizedPosts = normalizePosts(posts);
 window.addEventListener("DOMContentLoaded", init);
 function normalizePosts(posts) {
     return posts.map(p => ({
@@ -12,8 +13,12 @@ function normalizePosts(posts) {
 /* -------------------- INIT -------------------- */
 function init() {
     console.log("Posts loaded:", posts);
-    const normalized = normalizePosts(posts);
-    renderPostList(normalized);
+    // const normalized = normalizePosts(posts);
+    // renderPostList(normalized);
+    // Initial route handling (VERY IMPORTANT)
+    handleRoute();
+    // Listen for URL changes (back/forward buttons)
+    window.addEventListener("hashchange", handleRoute);
     searchInput.addEventListener("input", () => {
         clearTimeout(debounceTimer);
         debounceTimer = window.setTimeout(() => {
@@ -65,7 +70,23 @@ function renderPostCard(post) {
   `;
 }
 /* -------------------- OPEN POST -------------------- */
-async function openPost(post) {
+function openPost(post) {
+    window.location.hash = `post=${post.filename}`;
+}
+function handleRoute() {
+    const hash = window.location.hash;
+    if (hash.startsWith("#post=")) {
+        const filename = hash.replace("#post=", "");
+        const post = normalizedPosts.find(p => p.filename === filename);
+        if (post) {
+            renderPost(post);
+            return;
+        }
+    }
+    // default: homepage
+    renderPostList(normalizedPosts);
+}
+async function renderPost(post) {
     searchInput.style.display = "none";
     const markdown = await fetch(`./blogposts/${post.filename}`)
         .then(res => res.text());
@@ -81,7 +102,9 @@ async function openPost(post) {
     </div>
   `;
     document.getElementById("backBtn")
-        .addEventListener("click", () => renderPostList(posts));
+        .addEventListener("click", () => {
+        window.location.hash = "";
+    });
 }
 /* -------------------- MARKDOWN PARSER -------------------- */
 function parseMarkdown(md) {
