@@ -80,3 +80,16 @@ body {
   padding: 12px;
   overflow-x: auto;
 }
+.tag {
+  display: inline-block;
+  background: #eee;
+  padding: 4px 8px;
+  margin-right: 5px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.tag:hover {
+  background: #ddd;
+}

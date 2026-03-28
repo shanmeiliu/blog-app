@@ -33,6 +33,16 @@ function init() {
       renderPostList(filtered);
     }, 300);
   });
+  content.addEventListener("click", (e) => {
+  const tagEl = (e.target as HTMLElement).closest(".tag") as HTMLElement;
+  if (!tagEl) return;
+
+  const tag = tagEl.dataset.tag;
+  if (!tag) return;
+
+  // encode to make URL-safe
+  window.location.hash = `tag=${encodeURIComponent(tag.trim())}`;
+});
 }
 
 /* -------------------- SEARCH -------------------- */
@@ -51,7 +61,11 @@ function filterPosts(query: string): BlogPost[] {
 function sortByDate(list: BlogPost[]) {
   return [...list].sort((a, b) => b.date.getTime() - a.date.getTime());
 }
-
+function filterByTag(tag: string): BlogPost[] {
+  return normalizedPosts.filter(post =>
+    post.tags.some(t => t.toLowerCase() === tag.toLowerCase())
+  );
+}
 /* -------------------- RENDER LIST -------------------- */
 
 function renderPostList(list: BlogPost[]) {
@@ -67,19 +81,33 @@ function renderPostList(list: BlogPost[]) {
     const el = document.getElementById(post.filename);
     el?.addEventListener("click", () => openPost(post));
   });
+
+  const images = content.querySelectorAll(".post-card img");
+
+  images.forEach((el) => {
+  const img = el as HTMLImageElement; // ⭐ cast to HTMLImageElement
+  img.onerror = () => {
+    img.onerror = null;
+    img.src = "/thumbs/default.png";
+  };
+});
 }
 
 function renderPostCard(post: BlogPost): string {
+  const thumb = `./thumbs/${post.filename.replace(".md", ".png")}`;
+
   return `
     <div class="post-card" id="${post.filename}">
-      <img src="./thumbs/${post.filename.replace(".md", ".png")}" />
+      <img src="${thumb}" />
       <div>
         <h3>${post.title}</h3>
         <div class="post-meta">
           ${post.author} • ${post.date.toDateString()}
         </div>
         <div class="tags">
-          ${post.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}
+          ${post.tags.map(tag => `
+            <span class="tag" data-tag="${tag}">${tag}</span>
+          `).join("")}
         </div>
       </div>
     </div>
@@ -101,6 +129,20 @@ function handleRoute() {
       renderPost(post);
       return;
     }
+  }
+
+  if (hash.startsWith("#tag=")) {
+    // decode URL component
+    const tag = decodeURIComponent(hash.replace("#tag=", "").trim());
+    const filtered = normalizedPosts.filter(post =>
+      post.tags.some(t => t.trim().toLowerCase() === tag.toLowerCase())
+    );
+
+    searchInput.style.display = "block";
+    searchInput.value = ""; // optional: clear search
+
+    renderPostList(filtered);
+    return;
   }
 
   // default: homepage
