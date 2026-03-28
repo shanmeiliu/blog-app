@@ -109,29 +109,34 @@ async function openPost(post: BlogPost) {
 /* -------------------- MARKDOWN PARSER -------------------- */
 
 function parseMarkdown(md: string): string {
-  let html = md;
+  // @ts-ignore
+  const renderer = new marked.Renderer();
 
-  // headers
-  html = html.replace(/^### (.*$)/gim, "<h3>$1</h3>");
-  html = html.replace(/^## (.*$)/gim, "<h2>$1</h2>");
-  html = html.replace(/^# (.*$)/gim, "<h1>$1</h1>");
+  renderer.image = (token: any) => {
+    let src = token.href;
 
-  // bold / italic
-  html = html.replace(/\*\*(.*?)\*\*/gim, "<b>$1</b>");
-  html = html.replace(/\*(.*?)\*/gim, "<i>$1</i>");
+    if (typeof src !== "string") {
+      console.error("Invalid image src:", token);
+      return "";
+    }
 
-  // images
-  html = html.replace(/!\[(.*?)\]\((.*?)\)/gim, (_, alt, src) => {
     if (!src.startsWith("http")) {
       src = `./images/${src}`;
     }
-    return `<img src="${src}" alt="${alt}" />`;
+
+    return `<img src="${src}" alt="${token.text || ""}" ${
+      token.title ? `title="${token.title}"` : ""
+    } />`;
+  };
+
+  // @ts-ignore
+  marked.setOptions({
+    breaks: true,
+    gfm: true
   });
 
-  // paragraphs
-  html = html.replace(/\n$/gim, "<br />");
-
-  return html.trim();
+  // @ts-ignore
+  return marked.parse(md, { renderer });
 }
 
 /* -------------------- START -------------------- */
