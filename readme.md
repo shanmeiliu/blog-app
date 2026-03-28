@@ -30,9 +30,12 @@ A lightweight **TypeScript + HTML + CSS personal blog** that uses **Markdown fil
 - **Pure TypeScript + HTML + CSS**: No framework required.
 
 ## 📝 Adding a New Post
-Add a new Markdown file in /blogposts/, e.g., post3.md.
-Add a thumbnail in /thumbs/ named post3.png.
-Update manifest.ts:
+
+1. Add a new Markdown file in `/blogposts/`, e.g., `post3.md`.
+2. Add a thumbnail in `/thumbs/` named `post3.png`.
+3. Update `manifest.ts`:
+
+```ts
 {
   title: "My New Post",
   author: "Your Name",
@@ -41,3 +44,4 @@ Update manifest.ts:
   tags: ["tag1", "tag2"],
   searchWords: ["keywords", "for", "search"]
 }
+```
