@@ -11,7 +11,7 @@ dotenv.config({
 const BLOG_ROOT = path.join(process.cwd(), "blog");
 const POSTS_DIR = path.join(BLOG_ROOT, "blogposts");
 const OUTPUT_FILE = path.join(BLOG_ROOT, "manifest.ts");
-
+const DEFAULT_AUTHOR = process.env.DEFAULT_BLOG_AUTHOR || "Kitten"; //
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_URL =
   process.env.OPENAI_API_URL ||
@@ -78,18 +78,39 @@ function safeJsonArray(text: string | undefined, fallback: string[] = []): strin
 }
 
 function extractTitle(content: string): string {
-  const lines = content.split("\n").map((line) => line.trim());
+  const lines = content.split("\n");
 
-  for (const line of lines) {
-    if (line === "") continue;
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+
+    if (line === "") {
+      continue;
+    }
+
     if (line.startsWith("# ")) {
       const title = line.replace(/^# /, "").trim();
       return title || "Untitled Post";
     }
+
     break;
   }
 
   return "Untitled Post";
+}
+
+function hasUsableMetadata(existing?: ExistingBlogPost): boolean {
+  if (!existing) return false;
+
+  const tags = safeStringArray(existing.tags, []);
+  const searchWords = safeStringArray(existing.searchWords, []);
+
+  const hasRealTags =
+    tags.length > 0 &&
+    !(tags.length === 1 && tags[0].toLowerCase() === "uncategorized");
+
+  const hasRealSearchWords = searchWords.length > 0;
+
+  return hasRealTags && hasRealSearchWords;
 }
 
 function loadExistingManifest(): Record<string, ExistingBlogPost> {
@@ -98,18 +119,18 @@ function loadExistingManifest(): Record<string, ExistingBlogPost> {
   }
 
   const manifestContent = fs.readFileSync(OUTPUT_FILE, "utf-8");
-  const result: Record<string, ExistingBlogPost> = {};
 
   const postsArrayMatch = manifestContent.match(
-    /export const posts:\s*BlogPost\[\]\s*=\s*\[([\s\S]*?)\];/
+    /export const posts:\s*BlogPost\[\]\s*=\s*\[([\s\S]*?)\]\s*;/
   );
 
   if (!postsArrayMatch) {
     return {};
   }
 
-  const postsBody = postsArrayMatch[1];
-  const postBlocks = postsBody.match(/\{[\s\S]*?\n  \}/g) || [];
+  const postsContent = postsArrayMatch[1];
+  const postBlocks = postsContent.match(/\{[\s\S]*?\n  \}/g) || [];
+  const result: Record<string, ExistingBlogPost> = {};
 
   for (const block of postBlocks) {
     const filenameMatch = block.match(/filename:\s*"([^"]+)"/);
@@ -127,14 +148,14 @@ function loadExistingManifest(): Record<string, ExistingBlogPost> {
 
     result[filename] = {
       title: safeString(titleMatch?.[1], "Untitled Post"),
-      author: safeString(authorMatch?.[1], "Kitten"),
+      author: safeString(authorMatch?.[1], DEFAULT_AUTHOR),
       date: safeString(dateMatch?.[1], toDateExpression(new Date())),
       modifiedDate: safeString(
         modifiedDateMatch?.[1],
         safeString(dateMatch?.[1], toDateExpression(new Date()))
       ),
       filename,
-      tags: safeJsonArray(tagsMatch?.[1], ["uncategorized"]),
+      tags: safeJsonArray(tagsMatch?.[1], []),
       searchWords: safeJsonArray(searchWordsMatch?.[1], []),
       hash: safeString(hashMatch?.[1], ""),
     };
@@ -147,6 +168,14 @@ async function generateMetadata(content: string): Promise<{
   tags: string[];
   searchWords: string[];
 }> {
+  if (!OPENAI_API_KEY) {
+    console.warn("⚠️ Missing OPENAI_API_KEY. Using fallback metadata.");
+    return {
+      tags: ["uncategorized"],
+      searchWords: [],
+    };
+  }
+
   try {
     const response = await axios.post(
       OPENAI_URL,
@@ -159,10 +188,10 @@ async function generateMetadata(content: string): Promise<{
           },
           {
             role: "user",
-            content: `Return JSON only in this format:
+            content: `Return JSON only in exactly this format:
 {
-  "tags": ["3-6 short lowercase tags"],
-  "searchWords": ["8-15 relevant lowercase search keywords or short phrases"]
+  "tags": ["3-5 short lowercase tags"],
+  "searchWords": ["3-7 relevant lowercase search keywords or short phrases"]
 }
 
 Rules:
@@ -170,6 +199,8 @@ Rules:
 - searchWords should help blog search
 - do not include explanations
 - do not wrap the JSON in markdown
+- all values must be strings
+- avoid duplicates
 
 Blog post content:
 ${content.slice(0, 4000)}`,
@@ -186,7 +217,12 @@ ${content.slice(0, 4000)}`,
     );
 
     const text = response.data?.choices?.[0]?.message?.content;
-    const parsed = JSON.parse(typeof text === "string" ? text : "{}");
+
+    if (typeof text !== "string" || text.trim() === "") {
+      throw new Error("Empty AI response content");
+    }
+
+    const parsed = JSON.parse(text);
 
     return {
       tags: safeStringArray(parsed.tags, ["uncategorized"]),
@@ -194,21 +230,37 @@ ${content.slice(0, 4000)}`,
     };
   } catch (error) {
     console.warn("⚠️ AI metadata generation failed, using fallback.");
-    return {
-      tags: ["uncategorized"],
-      searchWords: [],
-    };
+    if (axios.isAxiosError(error)) {
+    if (error.response) {
+      console.error("🔴 OpenAI API Error:");
+      console.error("Status:", error.response.status);
+      console.error("Data:", JSON.stringify(error.response.data, null, 2));
+    } else if (error.request) {
+      console.error("🔴 No response received from OpenAI:", error.request);
+    } else {
+      console.error("🔴 Axios error message:", error.message);
+    }
+  } else if (error instanceof Error) {
+    console.error("🔴 Error message:", error.message);
+  } else {
+    console.error("🔴 Unknown error:", error);
+  }
+
+  return {
+    tags: ["uncategorized"],
+    searchWords: [],
+  };
   }
 }
 
 async function main() {
   console.log("🔍 Generating manifest...");
 
+  const existingPosts = loadExistingManifest();
+
   if (!fs.existsSync(POSTS_DIR)) {
     throw new Error(`Posts directory not found: ${POSTS_DIR}`);
   }
-
-  const existingPosts = loadExistingManifest();
 
   const files = fs
     .readdirSync(POSTS_DIR)
@@ -231,6 +283,7 @@ async function main() {
     let searchWords: string[];
     let publishDate: string;
     let modifiedDate: string;
+    let author: string;
 
     if (!existing) {
       console.log("🤖 New post, generating metadata...");
@@ -240,25 +293,37 @@ async function main() {
       searchWords = metadata.searchWords;
       publishDate = nowExpr;
       modifiedDate = nowExpr;
-    } else if (existing.hash === hash) {
+      author = DEFAULT_AUTHOR;
+    } else if (existing.hash === hash && hasUsableMetadata(existing)) {
       console.log("⚡ Unchanged, reusing existing metadata...");
       tags = safeStringArray(existing.tags, ["uncategorized"]);
       searchWords = safeStringArray(existing.searchWords, []);
       publishDate = safeString(existing.date, nowExpr);
       modifiedDate = safeString(existing.modifiedDate, publishDate);
+      author = safeString(existing.author, DEFAULT_AUTHOR);
+    } else if (existing.hash === hash) {
+      console.log("🔁 Unchanged content, but cached metadata is missing/invalid. Regenerating...");
+      const metadata = await generateMetadata(content);
+
+      tags = metadata.tags;
+      searchWords = metadata.searchWords;
+      publishDate = safeString(existing.date, nowExpr);
+      modifiedDate = safeString(existing.modifiedDate, publishDate);
+      author = safeString(existing.author, DEFAULT_AUTHOR);
     } else {
-      console.log("🤖 Changed, regenerating metadata...");
+      console.log("🤖 Changed content, regenerating metadata...");
       const metadata = await generateMetadata(content);
 
       tags = metadata.tags;
       searchWords = metadata.searchWords;
       publishDate = safeString(existing.date, nowExpr);
       modifiedDate = nowExpr;
+      author = safeString(existing.author, DEFAULT_AUTHOR);
     }
 
     posts.push({
       title,
-      author: safeString(existing?.author, "Kitten"),
+      author,
       date: publishDate,
       modifiedDate,
       filename: file,
