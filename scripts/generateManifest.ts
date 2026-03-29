@@ -363,6 +363,19 @@ ${posts
 `;
 
   fs.writeFileSync(OUTPUT_FILE, output, "utf-8");
+  // also generate manifest.js for browser usage
+    const jsOutput = output
+  .replace(/export interface[\s\S]*?\}\n\n/, "") // remove interface
+  .replace(/: Date/g, "") // remove TS types
+  .replace(/: string/g, "")
+  .replace(/: string\[\]/g, "")
+  .replace(/: BlogPost\[\]/g, "");
+
+    const JS_OUTPUT_FILE = OUTPUT_FILE.replace(".ts", ".js");
+
+    fs.writeFileSync(JS_OUTPUT_FILE, jsOutput, "utf-8");
+
+console.log("✅ manifest.js generated!");
 
   console.log("✅ manifest.ts generated successfully.");
 }

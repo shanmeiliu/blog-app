@@ -17,7 +17,7 @@ A lightweight **TypeScript + HTML + CSS personal blog** that uses **Markdown fil
 /blogposts/          → Markdown files for posts (e.g., post1.md, post2.md)
 /thumbs/             → Thumbnails for posts (matching markdown filenames)
 /images/             → Images referenced in markdown posts
-
+.env
 ```
 
 ## ✨ Features
