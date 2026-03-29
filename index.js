@@ -70,7 +70,7 @@ function renderPostList(list) {
         const img = el; // ⭐ cast to HTMLImageElement
         img.onerror = () => {
             img.onerror = null;
-            img.src = "/thumbs/fallback.png";
+            img.src = "thumbs/fallback.png";
         };
     });
 }
