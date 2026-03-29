@@ -88,7 +88,7 @@ function renderPostList(list: BlogPost[]) {
   const img = el as HTMLImageElement; // ⭐ cast to HTMLImageElement
   img.onerror = () => {
     img.onerror = null;
-    img.src = "/thumbs/default.png";
+    img.src = "/thumbs/fallback.png";
   };
 });
 }
