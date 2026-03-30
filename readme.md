@@ -45,3 +45,114 @@ A lightweight **TypeScript + HTML + CSS personal blog** that uses **Markdown fil
   searchWords: ["keywords", "for", "search"]
 }
 ```
+
+
+---
+
+## 🛠️ Manifest Generation (`generateManifest.ts`)
+
+This project includes a script to automatically generate `manifest.ts` from markdown blog posts in the `/posts` directory.
+
+### 🚀 Features
+
+#### 📄 Automatic Manifest Generation
+
+* Scans all `.md` files in `/posts`
+* Extracts metadata (title, filename, etc.)
+* Generates a complete `manifest.ts` file used by the blog
+
+---
+
+#### 🤖 AI-Powered Metadata (Tags & Search)
+
+* Uses OpenAI API to generate:
+
+  * `tags` (3–6 concise labels)
+  * `searchWords` (keywords for search functionality)
+* Ensures consistent and relevant metadata across posts
+
+---
+
+#### ⚡ Smart Caching with SHA256
+
+* Computes a SHA256 hash of each post’s content
+* Skips AI calls for unchanged posts
+* Dramatically improves performance and reduces API cost
+
+---
+
+#### 🔁 Intelligent Retry Logic
+
+* Detects invalid or fallback metadata (e.g. `["uncategorized"]`)
+* Re-generates metadata even if the post content hasn’t changed
+* Prevents permanent bad data from failed previous runs
+
+---
+
+#### 🗓️ Publish Date & Modified Date Tracking
+
+* `date`: preserved as original publish date
+* `modifiedDate`: updated only when post content changes
+* Ensures accurate timeline tracking for posts
+
+---
+
+#### 🛡️ Robust Error Handling
+
+* Handles OpenAI API errors gracefully
+* Logs detailed error information (status, response, message)
+* Falls back to safe defaults instead of breaking the build:
+
+  * `tags: ["uncategorized"]`
+  * `searchWords: []`
+
+---
+
+#### 🔒 Safe Parsing & Fault Tolerance
+
+* Safely parses existing `manifest.ts`
+* Handles missing or malformed fields without crashing
+* Applies defaults for all fields:
+
+  * `title`: `"Untitled Post"`
+  * `author`: `"Kitten"` (configurable)
+  * `tags`, `searchWords`: safe fallbacks
+
+---
+
+#### ⚙️ Environment Configurable
+
+Supports `.env` configuration:
+
+```env
+OPENAI_API_KEY=your_api_key
+OPENAI_API_URL=https://api.openai.com/v1/chat/completions
+OPENAI_MODEL=gpt-4o-mini
+DEFAULT_BLOG_AUTHOR=Kitten
+```
+
+---
+
+### ▶️ Usage
+After Add Script to package.json
+```
+  "scripts": {
+    "generate-manifest": "ts-node scripts/generateManifest.ts"
+  }
+```
+you can then 
+
+```bash
+npm run generate-manifest
+```
+
+---
+
+### 💡 Notes
+
+* The script is deterministic: unchanged content will not trigger new API calls
+* Designed to be resilient — failures will not block manifest generation
+* Recommended over git hooks for better control and debugging
+
+
+
