@@ -76,7 +76,14 @@ function safeJsonArray(text: string | undefined, fallback: string[] = []): strin
     return fallback;
   }
 }
-
+function cleanAiJsonResponse(text: string): string {
+  return text
+    .trim()
+    .replace(/^```json\s*/i, "")
+    .replace(/^```\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+}
 function extractTitle(content: string): string {
   const lines = content.split("\n");
 
@@ -200,7 +207,10 @@ Rules:
 - do not include explanations
 - do not wrap the JSON in markdown
 - all values must be strings
+- Do not prefix with json
+- Do not use markdown fences
 - avoid duplicates
+- Return raw JSON only
 
 Blog post content:
 ${content.slice(0, 4000)}`,
@@ -222,7 +232,7 @@ ${content.slice(0, 4000)}`,
       throw new Error("Empty AI response content");
     }
 
-    const parsed = JSON.parse(text);
+    const parsed = JSON.parse(cleanAiJsonResponse(text));
 
     return {
       tags: safeStringArray(parsed.tags, ["uncategorized"]),

@@ -26,8 +26,8 @@ export const posts: BlogPost[] = [
     date: new Date(2026, 0, 1, 1, 1, 1),
     modifiedDate: new Date(2026, 2, 29, 12, 21, 53),
     filename: "post2.md",
-    tags: ["uncategorized"],
-    searchWords: [],
+    tags: ["gardening","tomatoes","growing","vegetables"],
+    searchWords: ["tomato plant care","growing tomatoes","tomato varieties","garden vegetables","tomato problems","best tomatoes"],
     hash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   {
@@ -49,5 +49,15 @@ export const posts: BlogPost[] = [
     tags: ["rag","chunking","llm","ai"],
     searchWords: ["rag chunking strategy","text chunking","retrieval augmented generation","rag architecture","semantic chunking","rag performance","context windows"],
     hash: "4b721ef3c8d9e40482dde683e5d8fb371437989fdbb8000da6cdaa4baf43cd28"
+  },
+  {
+    title: "Elasticsearch BBQ: A Textbook Case of “Overtaking on a Curve” in Vector Search",
+    author: "Kitten",
+    date: new Date(2026, 2, 30, 15, 25, 22),
+    modifiedDate: new Date(2026, 2, 30, 15, 44, 10),
+    filename: "post5.md",
+    tags: ["vector search","elasticsearch","ai","performance","quantization"],
+    searchWords: ["vector database","similarity search","elasticsearch bbq","rabitq","hnsw","memory optimization","ai infrastructure"],
+    hash: "777c350482be6c6f5eb0fef52b5ca8bf7e65f757faf917ec455c0a1204b2932c"
   }
 ];
