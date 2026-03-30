@@ -78,7 +78,7 @@ function renderPostCard(post) {
     const thumb = `./thumbs/${post.filename.replace(".md", ".png")}`;
     return `
     <div class="post-card" id="${post.filename}">
-      <img src="${thumb}" />
+      <img src="${thumb}" class="post-thumb" alt="${post.title}" />
       <div>
         <h3>${post.title}</h3>
         <div class="post-meta">

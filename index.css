@@ -93,3 +93,23 @@ body {
 .tag:hover {
   background: #ddd;
 }
+
+.post-card {
+  overflow: visible;
+}
+
+.post-thumb {
+  width: 120px; /* adjust if needed */
+  height: auto;
+  display: block;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transform-origin: center center;
+  position: relative;
+  z-index: 1;
+}
+
+.post-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+  z-index: 10;
+}
