@@ -155,4 +155,109 @@ npm run generate-manifest
 * Recommended over git hooks for better control and debugging
 
 
+Add this section to your `README.md`:
+
+
+## Testing the LLM API with `testLLM.ts`
+
+This project includes a small utility script called `testLLM.ts` to help verify that your LLM API configuration is working before you rely on it inside `generateManifest.ts`.
+
+### Why this file is included
+
+The manifest generator can call an LLM to automatically create metadata such as:
+
+- `tags`
+- `searchWords`
+
+If the API key is missing, the endpoint is wrong, the model name is invalid, or the API response format is not what the script expects, the manifest generation step may fail or fall back to default metadata.
+
+`testLLM.ts` is included so you can test your LLM connection in isolation first. This makes debugging much easier because you can confirm:
+
+- your `.env` values are being loaded correctly
+- your API key is valid
+- your endpoint is reachable
+- your selected model works
+- the response shape looks correct
+- the returned content can be parsed as expected
+
+In short, this file is a simple smoke test for your LLM setup.
+
+---
+
+## What `testLLM.ts` is useful for
+
+You can use `testLLM.ts` when:
+
+- setting up the project for the first time
+- changing to a different LLM provider
+- changing the API URL
+- changing the model name
+- debugging API authentication issues
+- checking whether the model is returning JSON or wrapped markdown
+- confirming that your `.env` file is loaded correctly
+
+This is especially useful before running:
+
+```bash
+npm run generate-manifest
+````
+
+## Prerequisites
+
+Before running `testLLM.ts`, make sure you have:
+
+### 1. Node.js installed
+
+Recommended: Node.js 18 or newer.
+
+You can check with:
+
+```bash
+node -v
+npm -v
+```
+
+### 2. Project dependencies installed
+
+From the project root, run:
+
+```bash
+npm install
+```
+
+If your project uses TypeScript directly with `ts-node`, make sure these are installed:
+
+```bash
+npm install
+```
+
+Typical dependencies used for this script are:
+
+* `typescript`
+* `ts-node`
+* `dotenv`
+* `axios`
+
+If they are not installed yet, you can add them with:
+
+```bash
+npm install axios dotenv
+npm install -D typescript ts-node @types/node
+```
+
+---
+
+## Environment variables
+
+Create a `.env` file in the project root.
+
+Example:
+
+```env
+OPENAI_API_KEY=your_api_key_here
+OPENAI_API_URL=https://api.openai.com/v1/chat/completions
+OPENAI_MODEL=gpt-4o-mini
+DEFAULT_BLOG_AUTHOR=Kitten
+```
+
 

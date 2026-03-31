@@ -3,7 +3,7 @@ const content = document.getElementById("content");
 const searchInput = document.getElementById("search");
 let debounceTimer;
 const normalizedPosts = normalizePosts(posts);
-window.addEventListener("DOMContentLoaded", init);
+
 function normalizePosts(posts) {
     return posts.map(p => ({
         ...p,
