@@ -198,45 +198,35 @@ This is especially useful before running:
 
 ```bash
 npm run generate-manifest
-````
+```
 
-## Prerequisites
+### How to run `testLLM.ts`
 
-Before running `testLLM.ts`, make sure you have:
+#### Prerequisites
 
-### 1. Node.js installed
+Make sure you have:
 
-Recommended: Node.js 18 or newer.
+- Node.js (v18 or newer recommended)
+- npm installed
 
-You can check with:
+Check with:
 
 ```bash
 node -v
 npm -v
-```
+````
 
-### 2. Project dependencies installed
+---
 
-From the project root, run:
+### Install dependencies
 
-```bash
-npm install
-```
-
-If your project uses TypeScript directly with `ts-node`, make sure these are installed:
+From the project root:
 
 ```bash
 npm install
 ```
 
-Typical dependencies used for this script are:
-
-* `typescript`
-* `ts-node`
-* `dotenv`
-* `axios`
-
-If they are not installed yet, you can add them with:
+If needed, ensure these packages are installed:
 
 ```bash
 npm install axios dotenv
@@ -245,17 +235,46 @@ npm install -D typescript ts-node @types/node
 
 ---
 
-## Environment variables
+#### Configure environment variables
 
-Create a `.env` file in the project root.
-
-Example:
+Create a `.env` file in the project root:
 
 ```env
 OPENAI_API_KEY=your_api_key_here
 OPENAI_API_URL=https://api.openai.com/v1/chat/completions
 OPENAI_MODEL=gpt-4o-mini
-DEFAULT_BLOG_AUTHOR=Kitten
+```
+
+---
+
+#### Run the script
+
+From the project root:
+
+```bash
+npx ts-node scripts/testLLM.ts
+```
+
+If the file is located elsewhere, adjust the path accordingly.
+
+---
+
+#### Optional: npm script
+
+Add this to `package.json`:
+
+```json
+{
+  "scripts": {
+    "test-llm": "ts-node scripts/testLLM.ts"
+  }
+}
+```
+
+Then run:
+
+```bash
+npm run test-llm
 ```
 
 
