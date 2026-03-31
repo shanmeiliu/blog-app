@@ -19,6 +19,8 @@ Let’s start with HNSW.
 
 Its core idea is to build a **multi-layer graph structure**, where each vector in the dataset corresponds to a node in the graph. Connections between nodes are established based on vector similarity. During search, the algorithm can quickly navigate from the sparse graph in the upper layers to a region in the denser lower layers, greatly reducing the scope that needs to be traversed. This is the key reason why it can achieve both high-speed retrieval and high recall.
 
+![RAG Strategy](../images/hnsw_diagram_clean.png)
+
 But HNSW alone is not enough. When dealing with massive volumes of high-dimensional vectors, memory overhead is still a major problem. That is where **Scalar Quantization (SQ)** comes in.
 
 The principle of SQ is simple: it uses fewer bits to represent the floating-point values in a vector, thereby compressing the data.
