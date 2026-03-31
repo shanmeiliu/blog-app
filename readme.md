@@ -155,8 +155,6 @@ npm run generate-manifest
 * Recommended over git hooks for better control and debugging
 
 
-Add this section to your `README.md`:
-
 
 ## Testing the LLM API with `testLLM.ts`
 
