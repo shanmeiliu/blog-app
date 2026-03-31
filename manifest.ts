@@ -59,5 +59,15 @@ export const posts: BlogPost[] = [
     tags: ["vector search","elasticsearch","ai","performance","quantization"],
     searchWords: ["vector database","similarity search","elasticsearch bbq","rabitq","hnsw","memory optimization","ai infrastructure"],
     hash: "777c350482be6c6f5eb0fef52b5ca8bf7e65f757faf917ec455c0a1204b2932c"
+  },
+  {
+    title: "HNSW_SQ for Efficient Indexing: How to Balance RAG Speed, Recall, and Cost at the Same Time",
+    author: "Kitten",
+    date: new Date(2026, 2, 31, 11, 35, 23),
+    modifiedDate: new Date(2026, 2, 31, 11, 35, 23),
+    filename: "post6.md",
+    tags: ["hnsw","rag","vector","milvus","indexing"],
+    searchWords: ["hnsw sq","vector database","rag performance","scalar quantization","high-dimensional vectors","milvus indexing","memory optimization"],
+    hash: "9ba39f83e4955f63b085835a787276f846ec1a109a2042c2743b4f940df1ec78"
   }
 ];
