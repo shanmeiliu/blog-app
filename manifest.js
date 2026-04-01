@@ -58,5 +58,15 @@ export const posts = [
     tags: ["hnsw","rag","vector search","milvus"],
     searchWords: ["hnsw_sq","scalar quantization","rag performance","vector indexing","high-dimensional vectors","memory optimization","similarity search"],
     hash: "8c0b7ac7a4cb72a0498f6ff54969f85fb52db40f4e28af8ffb320bd408b2b24d"
+  },
+  {
+    title: "Code Interpreter Security in RAG Systems: From Sandbox Design to Production Implementation",
+    author: "Kitten",
+    date: new Date(2026, 3, 1, 14, 4, 33),
+    modifiedDate: new Date(2026, 3, 1, 14, 4, 33),
+    filename: "post7.md",
+    tags: ["rag","code interpreter","security"],
+    searchWords: ["code interpreter security","rag system","python sandbox","data execution","llm security","agent safety","e2b"],
+    hash: "964c35d5ddaffe5653ada4fde8ffd39fc41a4cd790e077898e466b6ffd9804f0"
   }
 ];
