@@ -79,5 +79,15 @@ export const posts: BlogPost[] = [
     tags: ["rag","code interpreter","security"],
     searchWords: ["code interpreter security","rag system","python sandbox","data execution","llm security","agent safety","e2b"],
     hash: "964c35d5ddaffe5653ada4fde8ffd39fc41a4cd790e077898e466b6ffd9804f0"
+  },
+  {
+    title: "Operating RAG Systems: A Complete Badcase Feedback Loop from Collection to Fix",
+    author: "Kitten",
+    date: new Date(2026, 3, 2, 20, 5, 52),
+    modifiedDate: new Date(2026, 3, 2, 20, 5, 52),
+    filename: "post8.md",
+    tags: ["rag","llm","feedback","knowledge"],
+    searchWords: ["rag operations","rag feedback loop","llm badcases","knowledge base maintenance","retrieval failure","hallucination","rag monitoring"],
+    hash: "658132e20ff7fd180c20a6ec36e1aea7488344b99d3ff51de7a6c45cee953898"
   }
 ];
