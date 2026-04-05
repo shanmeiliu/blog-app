@@ -78,5 +78,15 @@ export const posts = [
     tags: ["rag","llm","feedback","knowledge"],
     searchWords: ["rag operations","rag feedback loop","llm badcases","knowledge base maintenance","retrieval failure","hallucination","rag monitoring"],
     hash: "658132e20ff7fd180c20a6ec36e1aea7488344b99d3ff51de7a6c45cee953898"
+  },
+  {
+    title: "Untitled Post",
+    author: "Kitten",
+    date: new Date(2026, 3, 5, 13, 47, 27),
+    modifiedDate: new Date(2026, 3, 5, 13, 47, 27),
+    filename: "post9.md",
+    tags: ["redis","locks","distributed systems"],
+    searchWords: ["redis distributed locks","lock failure scenarios","redis master slave","redlock algorithm","zookeeper locks","etcd locks","cap theorem"],
+    hash: "c2dc3c1e627af525f148aa98c13b7a67d9ee5ab1f835a5392e2accf2026d27ce"
   }
 ];
