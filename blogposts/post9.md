@@ -162,7 +162,7 @@ Client
 * Still controversial
 
 ---
-
+![Distributed locks and Redis](../images/Distributed-locks-and-Redis.png)
 ## Solution 2: Zookeeper / etcd (Strong Consistency)
 
 If correctness is critical:
