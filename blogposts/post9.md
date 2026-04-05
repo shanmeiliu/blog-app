@@ -1,4 +1,4 @@
-````markdown id="kq1zjv"
+
 # Distributed Locks with Redis: What Happens If Redis Crashes?
 
 ## The Classic Question
@@ -36,7 +36,6 @@ if success {
 
     redisClient.Del(ctx, "order_lock:123")
 }
-````
 
 ### Safe Lock Release with Lua
 
