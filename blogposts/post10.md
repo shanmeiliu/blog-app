@@ -4,7 +4,7 @@
 
 Fine-tuning large language models with all parameters is extremely expensive. Models with tens or hundreds of billions of parameters require enormous GPU memory, compute power, and storage. For most teams, full fine-tuning is simply not practical.
 
-To address this, techniques like **LoRA** and **QLoRA** were introduced to significantly reduce the cost while maintaining high performance.
+To address this, techniques like **LoRA** and **QLoRA** were introduced to significantly reduce the cost while maintaining high performance. 
 
 ---
 
@@ -36,27 +36,27 @@ LoRA modifies the forward pass as follows:
 
 ```mermaid
 flowchart LR
-    x[Input x]
-    W[Original Weight W (Frozen)]
-    A[Matrix A]
-    B[Matrix B]
-    Wx[W * x]
-    BAx[B * A * x]
-    h[Output h]
+    x["Input x"]
+    W["Original Weight W<br/>(Frozen)"]
+    A["Matrix A"]
+    B["Matrix B"]
+    Wx["W × x"]
+    BAx["B × A × x"]
+    h["Output h"]
 
     x --> W --> Wx --> h
     x --> A --> B --> BAx --> h
 ```
 
-[
+$$
 h = Wx + BAx
-]
+$$
 
 Where:
 
-* ( W ): original weight matrix (unchanged)
-* ( A, B ): small trainable matrices
-* Only ( A ) and ( B ) are updated during training
+* **W**: original weight matrix (unchanged)
+* **A, B**: small trainable matrices
+* Only **A** and **B** are updated during training
 
 ---
 
@@ -68,23 +68,23 @@ Where:
 
 ---
 
-### 2.5 Rank ( r ) Trade-off
+### 2.5 Rank (r) Trade-off
 
-The rank ( r ) controls model capacity:
+The rank **r** controls model capacity:
 
 ```mermaid
 graph LR
-    small_r[r = small]
-    medium_r[r = medium]
-    large_r[r = large]
+    small_r["r = small"]
+    medium_r["r = medium"]
+    large_r["r = large"]
 
-    small_r --> low_cost[Low cost, lower accuracy]
-    medium_r --> balanced[Balanced trade-off]
-    large_r --> high_cost[Higher accuracy, higher cost]
+    small_r --> low_cost["Low cost, lower accuracy"]
+    medium_r --> balanced["Balanced trade-off"]
+    large_r --> high_cost["Higher accuracy, higher cost"]
 ```
 
 * Typical values: **8–64**
-* Larger ( r ) → better approximation, higher cost
+* Larger **r** → better approximation, higher cost
 
 ---
 
@@ -124,15 +124,15 @@ Weights in neural networks typically follow a **normal distribution**.
 
 ```mermaid
 graph TD
-    Dist[Weight Distribution]
-    Center[Dense region (center)]
-    Tail[Sparse region (tails)]
+    Dist["Weight Distribution"]
+    Center["Dense region<br/>(center)"]
+    Tail["Sparse region<br/>(tails)"]
 
     Dist --> Center
     Dist --> Tail
 
-    Center --> MorePrecision[More quantization levels]
-    Tail --> LessPrecision[Fewer quantization levels]
+    Center --> MorePrecision["More quantization levels"]
+    Tail --> LessPrecision["Fewer quantization levels"]
 ```
 
 NF4:
@@ -153,10 +153,10 @@ These scaling factors also consume memory, so QLoRA:
 
 ```mermaid
 flowchart LR
-    W[Original Weights]
-    Q1[4-bit Quantization]
-    S[Scaling Constants]
-    Q2[Double Quantization]
+    W["Original Weights"]
+    Q1["4-bit Quantization"]
+    S["Scaling Constants"]
+    Q2["Double Quantization"]
 
     W --> Q1 --> S --> Q2
 ```
@@ -180,11 +180,11 @@ QLoRA uses dynamic offloading:
 
 ```mermaid
 flowchart LR
-    GPU[GPU Memory]
-    CPU[System Memory]
+    GPU["GPU Memory"]
+    CPU["System Memory"]
 
-    GPU -->|When full| CPU
-    CPU -->|When needed| GPU
+    GPU -->|"When full"| CPU
+    CPU -->|"When needed"| GPU
 ```
 
 * Moves optimizer states to **CPU memory** when GPU is full
@@ -197,18 +197,18 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    LoRA[LoRA]
-    QLoRA[QLoRA]
+    LoRA["LoRA"]
+    QLoRA["QLoRA"]
 
-    LoRA --> A[Low-rank matrices (A, B)]
-    QLoRA --> B1[4-bit quantization]
-    QLoRA --> B2[Double quantization]
-    QLoRA --> B3[CPU offloading]
+    LoRA --> A["Low-rank matrices<br/>(A, B)"]
+    QLoRA --> B1["4-bit quantization"]
+    QLoRA --> B2["Double quantization"]
+    QLoRA --> B3["CPU offloading"]
 
-    A --> Result1[Efficient fine-tuning]
-    B1 --> Result2[Reduced model size]
+    A --> Result1["Efficient fine-tuning"]
+    B1 --> Result2["Reduced model size"]
     B2 --> Result2
-    B3 --> Result3[Lower GPU memory usage]
+    B3 --> Result3["Lower GPU memory usage"]
 ```
 
 * **LoRA**: reduces training cost by limiting trainable parameters
@@ -216,3 +216,5 @@ flowchart TD
 
 Together, they make fine-tuning large models significantly more practical and accessible.
 
+## Source: 
+https://mp.weixin.qq.com/s/VA0YAeIYanzTiVkSnYrZUA

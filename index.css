@@ -14,8 +14,7 @@ body {
   width: 100%;
   padding: 10px;
   font-size: 16px;
-
-  box-sizing: border-box; /* ⭐ THIS fixes the symmetry */
+  box-sizing: border-box;
   border-radius: 6px;
   border: none;
 }
@@ -34,6 +33,7 @@ body {
   cursor: pointer;
   display: flex;
   gap: 16px;
+  overflow: visible;
 }
 
 .post-card img {
@@ -58,6 +58,11 @@ body {
   margin-right: 5px;
   border-radius: 4px;
   font-size: 12px;
+  cursor: pointer;
+}
+
+.tag:hover {
+  background: #ddd;
 }
 
 .post-view {
@@ -70,36 +75,49 @@ body {
   cursor: pointer;
   color: blue;
 }
-.post-view h1 { font-size: 28px; }
-.post-view h2 { font-size: 24px; }
-.post-view p { line-height: 1.6; }
-.post-view img { max-width: 100%; }
-.post-view pre {
+
+.post-view h1 {
+  font-size: 28px;
+}
+
+.post-view h2 {
+  font-size: 24px;
+}
+
+.post-view p {
+  line-height: 1.6;
+}
+
+.post-view img {
+  max-width: 100%;
+}
+
+.post-view pre:not(.mermaid) {
   background: #111;
   color: #eee;
   padding: 12px;
   overflow-x: auto;
-}
-.tag {
-  display: inline-block;
-  background: #eee;
-  padding: 4px 8px;
-  margin-right: 5px;
-  border-radius: 4px;
-  font-size: 12px;
-  cursor: pointer;
+  border-radius: 8px;
 }
 
-.tag:hover {
-  background: #ddd;
+.post-view pre.mermaid {
+  background: #fff;
+  color: inherit;
+  padding: 16px;
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
 }
 
-.post-card {
-  overflow: visible;
+.post-view .mermaid svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
 }
 
 .post-thumb {
-  width: 120px; /* adjust if needed */
+  width: 120px;
   height: auto;
   display: block;
   transition: transform 0.2s ease, box-shadow 0.2s ease;

@@ -24,11 +24,11 @@ export const posts: BlogPost[] = [
     title: "LoRA and QLoRA Explained: Principles and Memory Optimization Techniques",
     author: "Kitten",
     date: new Date(2026, 3, 15, 10, 53, 38),
-    modifiedDate: new Date(2026, 3, 15, 10, 53, 38),
+    modifiedDate: new Date(2026, 3, 15, 12, 8, 57),
     filename: "post10.md",
     tags: ["lora","qlora","finetuning","llm"],
-    searchWords: ["large language models","parameter efficient finetuning","low rank adaptation","4 bit quantization","memory optimization","gpu memory","qlora explained"],
-    hash: "bf73311acd4a35baded3bae503311641d82d66234d1e4264c59fc393dc287073"
+    searchWords: ["large language models","parameter efficient finetuning","low rank adaptation","quantization","memory optimization","gpu memory","qlora explained"],
+    hash: "22996ba2f7e593b78f8b3f632bc9551dcd6608ca6a5b1c0bec3aa2ed3ad80958"
   },
   {
     title: "Untitled Post",
