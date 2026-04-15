@@ -21,6 +21,16 @@ export const posts: BlogPost[] = [
     hash: "fe07827968b58d486123963a74a73409d6c1c770bb8b00d73e43881125645459"
   },
   {
+    title: "LoRA and QLoRA Explained: Principles and Memory Optimization Techniques",
+    author: "Kitten",
+    date: new Date(2026, 3, 15, 10, 53, 38),
+    modifiedDate: new Date(2026, 3, 15, 10, 53, 38),
+    filename: "post10.md",
+    tags: ["lora","qlora","finetuning","llm"],
+    searchWords: ["large language models","parameter efficient finetuning","low rank adaptation","4 bit quantization","memory optimization","gpu memory","qlora explained"],
+    hash: "bf73311acd4a35baded3bae503311641d82d66234d1e4264c59fc393dc287073"
+  },
+  {
     title: "Untitled Post",
     author: "Kitten",
     date: new Date(2026, 0, 1, 1, 1, 1),
@@ -94,10 +104,10 @@ export const posts: BlogPost[] = [
     title: "Distributed Locks with Redis: What Happens If Redis Crashes?",
     author: "Kitten",
     date: new Date(2026, 3, 5, 13, 47, 27),
-    modifiedDate: new Date(2026, 3, 5, 13, 55, 7),
+    modifiedDate: new Date(2026, 3, 15, 10, 53, 43),
     filename: "post9.md",
-    tags: ["redis","distributed locks","consistency"],
-    searchWords: ["redis locks","distributed locking","cap theorem","redlock","zookeeper","etcd","lock failure"],
-    hash: "aa26c4dee61ae132fbb2343ae902dd68522cc456048776c971a3ee1a1c5bebfa"
+    tags: ["redis","locking","distributed systems"],
+    searchWords: ["redis locks","distributed locking","redis crash","redlock","zookeeper","etcd","consistency availability"],
+    hash: "6e02b0fa24612ee1579c8f24750da0653c97689e4513d93b3a1ef8629941971c"
   }
 ];
