@@ -13,11 +13,21 @@ export const posts = [
     title: "LoRA and QLoRA Explained: Principles and Memory Optimization Techniques",
     author: "Kitten",
     date: new Date(2026, 3, 15, 10, 53, 38),
-    modifiedDate: new Date(2026, 3, 15, 12, 8, 57),
+    modifiedDate: new Date(2026, 3, 20, 11, 35, 24),
     filename: "post10.md",
-    tags: ["lora","qlora","finetuning","llm"],
-    searchWords: ["large language models","parameter efficient finetuning","low rank adaptation","quantization","memory optimization","gpu memory","qlora explained"],
-    hash: "22996ba2f7e593b78f8b3f632bc9551dcd6608ca6a5b1c0bec3aa2ed3ad80958"
+    tags: ["lora","qlora","finetuning"],
+    searchWords: ["large language models","parameter efficient finetuning","memory optimization","low rank adaptation","quantization","gpu memory","deep learning"],
+    hash: "8b37832c86dbc99c9066e70d2226cd0cef6a831c13b2aac5bfc52b4a8bd655f3"
+  },
+  {
+    title: "JD Interviewer Follow-up: “Your RAG System Retrieved the CEO’s Salary for a Regular Employee—How Do You Handle Permissions?”",
+    author: "Kitten",
+    date: new Date(2026, 3, 20, 11, 35, 28),
+    modifiedDate: new Date(2026, 3, 20, 11, 37, 0),
+    filename: "post11.md",
+    tags: ["rag","permissions","security"],
+    searchWords: ["rag security","permission control","data access","vector database","least privilege","pre-filtering","post-filtering"],
+    hash: "0068d82e8a9ca2a88ff98ed030bf8091fd6f7408736f0148384e8b1d331e7366"
   },
   {
     title: "Untitled Post",
