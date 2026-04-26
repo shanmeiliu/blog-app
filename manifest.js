@@ -30,6 +30,16 @@ export const posts = [
     hash: "0068d82e8a9ca2a88ff98ed030bf8091fd6f7408736f0148384e8b1d331e7366"
   },
   {
+    title: "Context-aware AI that Adapts to the Audience",
+    author: "Kitten",
+    date: new Date(2026, 3, 26, 17, 51, 48),
+    modifiedDate: new Date(2026, 3, 26, 17, 51, 48),
+    filename: "post12.md",
+    tags: ["ai","context","llm"],
+    searchWords: ["context aware ai","rag","audience modeling","prompt engineering","adaptive ai","ai architecture","llm context"],
+    hash: "dc78ba7ac4acc365f2530ac437d72ddf65539509681522624272eeaac945ea24"
+  },
+  {
     title: "Untitled Post",
     author: "Kitten",
     date: new Date(2026, 0, 1, 1, 1, 1),
