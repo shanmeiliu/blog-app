@@ -51,6 +51,16 @@ export const posts: BlogPost[] = [
     hash: "dc78ba7ac4acc365f2530ac437d72ddf65539509681522624272eeaac945ea24"
   },
   {
+    title: "Model Context Protocol (MCP): A Systems-Level Approach to Context-Aware AI",
+    author: "Kitten",
+    date: new Date(2026, 4, 3, 11, 24, 39),
+    modifiedDate: new Date(2026, 4, 3, 11, 24, 39),
+    filename: "post13.md",
+    tags: ["ai","mcp","llm","architecture","context"],
+    searchWords: ["model context protocol","ai context management","llm orchestration","context-aware ai","ai systems design"],
+    hash: "656f756488aa9976a50b140499d468b7ee75576f274a59fbbd1d540ac9e7990e"
+  },
+  {
     title: "Untitled Post",
     author: "Kitten",
     date: new Date(2026, 0, 1, 1, 1, 1),
