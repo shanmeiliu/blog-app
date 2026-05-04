@@ -50,6 +50,16 @@ export const posts = [
     hash: "656f756488aa9976a50b140499d468b7ee75576f274a59fbbd1d540ac9e7990e"
   },
   {
+    title: "A/B Testing LLM Outputs in Production Systems",
+    author: "Kitten",
+    date: new Date(2026, 4, 4, 19, 37, 19),
+    modifiedDate: new Date(2026, 4, 4, 19, 37, 19),
+    filename: "post14.md",
+    tags: ["llm","ab testing","production","ai engineering"],
+    searchWords: ["llm testing in production","ab testing for llm","llm evaluation strategies","llm-as-a-judge","ai monitoring"],
+    hash: "f8365bfdd56ecb379a9384c2af08e20a9c1eba97ecaadb08eab81b79b8f4fd8e"
+  },
+  {
     title: "Untitled Post",
     author: "Kitten",
     date: new Date(2026, 0, 1, 1, 1, 1),
