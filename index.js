@@ -65,21 +65,22 @@ function renderPostList(list) {
     });
 }
 function renderPostCard(post) {
-    const thumb = `./thumbs/${post.filename.replace(".md", ".png")}`;
     return `
     <div class="post-card" id="${post.filename}">
-      <img src="${thumb}" class="post-thumb" alt="${post.title}" />
+      <img src="./thumbs/${post.filename.replace(".md", ".png")}" />
       <div>
         <h3>${post.title}</h3>
+
         <div class="post-meta">
-          ${post.author} • ${post.date.toDateString()}
+          ${post.author} • ${post.date.toDateString()} • ${post.readingTime}
         </div>
+
+        <p class="post-excerpt">
+          ${post.excerpt}
+        </p>
+
         <div class="tags">
-          ${post.tags
-        .map((tag) => `
-            <span class="tag" data-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</span>
-          `)
-        .join("")}
+          ${post.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}
         </div>
       </div>
     </div>

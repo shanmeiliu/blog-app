@@ -6,16 +6,16 @@ import crypto from "crypto";
 
 dotenv.config({
   path: path.join(process.cwd(), "blog/.env"),
-});;
+});
 
 const BLOG_ROOT = path.join(process.cwd(), "blog");
 const POSTS_DIR = path.join(BLOG_ROOT, "blogposts");
 const OUTPUT_FILE = path.join(BLOG_ROOT, "manifest.ts");
-const DEFAULT_AUTHOR = process.env.DEFAULT_BLOG_AUTHOR || "Kitten"; //
+
+const DEFAULT_AUTHOR = process.env.DEFAULT_BLOG_AUTHOR || "Kitten";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_URL =
-  process.env.OPENAI_API_URL ||
-  "https://api.openai.com/v1/chat/completions";
+  process.env.OPENAI_API_URL || "https://api.openai.com/v1/chat/completions";
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
 
 if (!OPENAI_API_KEY) {
@@ -30,6 +30,8 @@ interface ExistingBlogPost {
   filename: string;
   tags: string[];
   searchWords: string[];
+  excerpt: string;
+  readingTime: string;
   hash: string;
 }
 
@@ -41,6 +43,8 @@ interface GeneratedBlogPost {
   filename: string;
   tags: string[];
   searchWords: string[];
+  excerpt: string;
+  readingTime: string;
   hash: string;
 }
 
@@ -52,6 +56,17 @@ function hashContent(content: string): string {
   return crypto.createHash("sha256").update(content).digest("hex");
 }
 
+function calculateReadingTime(content: string): string {
+  const words = content
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/[#>*_\-\[\]()`]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean).length;
+
+  const minutes = Math.max(1, Math.ceil(words / 220));
+  return `${minutes} min read`;
+}
+
 function safeString(value: unknown, fallback: string): string {
   return typeof value === "string" && value.trim() !== "" ? value : fallback;
 }
@@ -60,7 +75,7 @@ function safeStringArray(value: unknown, fallback: string[] = []): string[] {
   if (!Array.isArray(value)) return fallback;
 
   const cleaned = value.filter(
-    (item): item is string => typeof item === 'string' && item.trim() !== ""
+    (item): item is string => typeof item === "string" && item.trim() !== ""
   );
 
   return cleaned.length > 0 ? cleaned : fallback;
@@ -76,6 +91,7 @@ function safeJsonArray(text: string | undefined, fallback: string[] = []): strin
     return fallback;
   }
 }
+
 function cleanAiJsonResponse(text: string): string {
   return text
     .trim()
@@ -84,15 +100,14 @@ function cleanAiJsonResponse(text: string): string {
     .replace(/\s*```$/, "")
     .trim();
 }
+
 function extractTitle(content: string): string {
   const lines = content.split("\n");
 
   for (const rawLine of lines) {
     const line = rawLine.trim();
 
-    if (line === "") {
-      continue;
-    }
+    if (line === "") continue;
 
     if (line.startsWith("# ")) {
       const title = line.replace(/^# /, "").trim();
@@ -110,14 +125,16 @@ function hasUsableMetadata(existing?: ExistingBlogPost): boolean {
 
   const tags = safeStringArray(existing.tags, []);
   const searchWords = safeStringArray(existing.searchWords, []);
+  const excerpt = safeString(existing.excerpt, "");
 
   const hasRealTags =
     tags.length > 0 &&
     !(tags.length === 1 && tags[0].toLowerCase() === "uncategorized");
 
   const hasRealSearchWords = searchWords.length > 0;
+  const hasRealExcerpt = excerpt.length > 0;
 
-  return hasRealTags && hasRealSearchWords;
+  return hasRealTags && hasRealSearchWords && hasRealExcerpt;
 }
 
 function loadExistingManifest(): Record<string, ExistingBlogPost> {
@@ -137,6 +154,7 @@ function loadExistingManifest(): Record<string, ExistingBlogPost> {
 
   const postsContent = postsArrayMatch[1];
   const postBlocks = postsContent.match(/\{[\s\S]*?\n  \}/g) || [];
+
   const result: Record<string, ExistingBlogPost> = {};
 
   for (const block of postBlocks) {
@@ -151,6 +169,8 @@ function loadExistingManifest(): Record<string, ExistingBlogPost> {
     const modifiedDateMatch = block.match(/modifiedDate:\s*(new Date\([^)]+\))/);
     const tagsMatch = block.match(/tags:\s*(\[[\s\S]*?\])/);
     const searchWordsMatch = block.match(/searchWords:\s*(\[[\s\S]*?\])/);
+    const excerptMatch = block.match(/excerpt:\s*"([^"]*)"/);
+    const readingTimeMatch = block.match(/readingTime:\s*"([^"]*)"/);
     const hashMatch = block.match(/hash:\s*"([^"]+)"/);
 
     result[filename] = {
@@ -164,6 +184,8 @@ function loadExistingManifest(): Record<string, ExistingBlogPost> {
       filename,
       tags: safeJsonArray(tagsMatch?.[1], []),
       searchWords: safeJsonArray(searchWordsMatch?.[1], []),
+      excerpt: safeString(excerptMatch?.[1], ""),
+      readingTime: safeString(readingTimeMatch?.[1], ""),
       hash: safeString(hashMatch?.[1], ""),
     };
   }
@@ -174,12 +196,14 @@ function loadExistingManifest(): Record<string, ExistingBlogPost> {
 async function generateMetadata(content: string): Promise<{
   tags: string[];
   searchWords: string[];
+  excerpt: string;
 }> {
   if (!OPENAI_API_KEY) {
     console.warn("⚠️ Missing OPENAI_API_KEY. Using fallback metadata.");
     return {
       tags: ["uncategorized"],
       searchWords: [],
+      excerpt: "",
     };
   }
 
@@ -196,14 +220,18 @@ async function generateMetadata(content: string): Promise<{
           {
             role: "user",
             content: `Return JSON only in exactly this format:
+
 {
   "tags": ["3-5 short lowercase tags"],
-  "searchWords": ["3-7 relevant lowercase search keywords or short phrases"]
+  "searchWords": ["3-7 relevant lowercase search keywords or short phrases"],
+  "excerpt": "A concise 1-2 sentence summary for a blog card, max 180 characters"
 }
 
 Rules:
 - tags should be concise
 - searchWords should help blog search
+- excerpt should summarize the technical value of the post
+- excerpt should be natural and professional
 - do not include explanations
 - do not wrap the JSON in markdown
 - all values must be strings
@@ -237,34 +265,37 @@ ${content.slice(0, 4000)}`,
     return {
       tags: safeStringArray(parsed.tags, ["uncategorized"]),
       searchWords: safeStringArray(parsed.searchWords, []),
+      excerpt: safeString(parsed.excerpt, ""),
     };
   } catch (error) {
     console.warn("⚠️ AI metadata generation failed, using fallback.");
-    if (axios.isAxiosError(error)) {
-    if (error.response) {
-      console.error("🔴 OpenAI API Error:");
-      console.error("Status:", error.response.status);
-      console.error("Data:", JSON.stringify(error.response.data, null, 2));
-    } else if (error.request) {
-      console.error("🔴 No response received from OpenAI:", error.request);
-    } else {
-      console.error("🔴 Axios error message:", error.message);
-    }
-  } else if (error instanceof Error) {
-    console.error("🔴 Error message:", error.message);
-  } else {
-    console.error("🔴 Unknown error:", error);
-  }
 
-  return {
-    tags: ["uncategorized"],
-    searchWords: [],
-  };
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        console.error("OpenAI API Error:");
+        console.error("Status:", error.response.status);
+        console.error("Data:", JSON.stringify(error.response.data, null, 2));
+      } else if (error.request) {
+        console.error("No response received from OpenAI:", error.request);
+      } else {
+        console.error("Axios error message:", error.message);
+      }
+    } else if (error instanceof Error) {
+      console.error("Error message:", error.message);
+    } else {
+      console.error("Unknown error:", error);
+    }
+
+    return {
+      tags: ["uncategorized"],
+      searchWords: [],
+      excerpt: "",
+    };
   }
 }
 
 async function main() {
-  console.log("🔍 Generating manifest...");
+  console.log("Generating manifest...");
 
   const existingPosts = loadExistingManifest();
 
@@ -280,52 +311,60 @@ async function main() {
   const posts: GeneratedBlogPost[] = [];
 
   for (const file of files) {
-    console.log(`📄 Processing ${file}...`);
+    console.log(`Processing ${file}...`);
 
     const fullPath = path.join(POSTS_DIR, file);
     const content = fs.readFileSync(fullPath, "utf-8");
+
     const hash = hashContent(content);
     const title = extractTitle(content);
+    const readingTime = calculateReadingTime(content);
     const existing = existingPosts[file];
     const nowExpr = toDateExpression(new Date());
 
     let tags: string[];
     let searchWords: string[];
+    let excerpt: string;
     let publishDate: string;
     let modifiedDate: string;
     let author: string;
 
     if (!existing) {
-      console.log("🤖 New post, generating metadata...");
+      console.log("New post, generating metadata...");
       const metadata = await generateMetadata(content);
 
       tags = metadata.tags;
       searchWords = metadata.searchWords;
+      excerpt = metadata.excerpt;
       publishDate = nowExpr;
       modifiedDate = nowExpr;
       author = DEFAULT_AUTHOR;
     } else if (existing.hash === hash && hasUsableMetadata(existing)) {
       console.log("⚡ Unchanged, reusing existing metadata...");
+
       tags = safeStringArray(existing.tags, ["uncategorized"]);
       searchWords = safeStringArray(existing.searchWords, []);
+      excerpt = safeString(existing.excerpt, "");
       publishDate = safeString(existing.date, nowExpr);
       modifiedDate = safeString(existing.modifiedDate, publishDate);
       author = safeString(existing.author, DEFAULT_AUTHOR);
     } else if (existing.hash === hash) {
-      console.log("🔁 Unchanged content, but cached metadata is missing/invalid. Regenerating...");
+      console.log("Unchanged content, but cached metadata is missing/invalid. Regenerating...");
       const metadata = await generateMetadata(content);
 
       tags = metadata.tags;
       searchWords = metadata.searchWords;
+      excerpt = metadata.excerpt;
       publishDate = safeString(existing.date, nowExpr);
       modifiedDate = safeString(existing.modifiedDate, publishDate);
       author = safeString(existing.author, DEFAULT_AUTHOR);
     } else {
-      console.log("🤖 Changed content, regenerating metadata...");
+      console.log("Changed content, regenerating metadata...");
       const metadata = await generateMetadata(content);
 
       tags = metadata.tags;
       searchWords = metadata.searchWords;
+      excerpt = metadata.excerpt;
       publishDate = safeString(existing.date, nowExpr);
       modifiedDate = nowExpr;
       author = safeString(existing.author, DEFAULT_AUTHOR);
@@ -339,6 +378,8 @@ async function main() {
       filename: file,
       tags,
       searchWords,
+      excerpt,
+      readingTime,
       hash,
     });
   }
@@ -351,6 +392,8 @@ async function main() {
   filename: string;
   tags: string[];
   searchWords: string[];
+  excerpt: string;
+  readingTime: string;
   hash: string;
 }
 
@@ -365,6 +408,8 @@ ${posts
     filename: ${JSON.stringify(post.filename)},
     tags: ${JSON.stringify(post.tags)},
     searchWords: ${JSON.stringify(post.searchWords)},
+    excerpt: ${JSON.stringify(post.excerpt)},
+    readingTime: ${JSON.stringify(post.readingTime)},
     hash: ${JSON.stringify(post.hash)}
   }`
   )
@@ -373,20 +418,18 @@ ${posts
 `;
 
   fs.writeFileSync(OUTPUT_FILE, output, "utf-8");
-  // also generate manifest.js for browser usage
-    const jsOutput = output
-  .replace(/export interface[\s\S]*?\}\n\n/, "") // remove interface
-  .replace(/: Date/g, "") // remove TS types
-  .replace(/: string/g, "")
-  .replace(/: string\[\]/g, "")
-  .replace(/: BlogPost\[\]/g, "");
 
-    const JS_OUTPUT_FILE = OUTPUT_FILE.replace(".ts", ".js");
+  const jsOutput = output
+    .replace(/export interface[\s\S]*?\}\n\n/, "")
+    .replace(/: Date/g, "")
+    .replace(/: string/g, "")
+    .replace(/: string\[\]/g, "")
+    .replace(/: BlogPost\[\]/g, "");
 
-    fs.writeFileSync(JS_OUTPUT_FILE, jsOutput, "utf-8");
+  const JS_OUTPUT_FILE = OUTPUT_FILE.replace(".ts", ".js");
+  fs.writeFileSync(JS_OUTPUT_FILE, jsOutput, "utf-8");
 
-console.log("✅ manifest.js generated!");
-
+  console.log("✅ manifest.js generated!");
   console.log("✅ manifest.ts generated successfully.");
 }
 
