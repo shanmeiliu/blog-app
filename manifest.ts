@@ -85,6 +85,18 @@ export const posts: BlogPost[] = [
     hash: "f8365bfdd56ecb379a9384c2af08e20a9c1eba97ecaadb08eab81b79b8f4fd8e"
   },
   {
+    title: "Designing Data-Intensive Applications — Applied to Modern AI & RAG Systems",
+    author: "Kitten",
+    date: new Date(2026, 4, 6, 15, 5, 26),
+    modifiedDate: new Date(2026, 4, 6, 15, 13, 34),
+    filename: "post15.md",
+    tags: ["ai","rag","distributed-systems","data-engineering"],
+    searchWords: ["rag architecture","designing data-intensive applications","vector database consistency","llm data systems","semantic retrieval"],
+    excerpt: "Learn how to apply fundamental distributed systems principles from DDIA to modern RAG architectures, focusing on semantic consistency, data contracts, and indexing trade-offs.",
+    readingTime: "4 min read",
+    hash: "7f2c35f2c1dba6d4db75ef56d68814b7095efd65f891801896a119a660121d8c"
+  },
+  {
     title: "Untitled Post",
     author: "Kitten",
     date: new Date(2026, 4, 5, 19, 40, 56),
