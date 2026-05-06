@@ -3,57 +3,99 @@ const content = document.getElementById("content");
 const searchInput = document.getElementById("search");
 let debounceTimer;
 let mermaidInitialized = false;
+let activeSearchQuery = "";
 const normalizedPosts = normalizePosts(posts);
 window.addEventListener("DOMContentLoaded", init);
 function normalizePosts(posts) {
     return posts.map((p) => ({
         ...p,
         date: new Date(p.date),
+        modifiedDate: new Date(p.modifiedDate),
     }));
 }
 function init() {
-    console.log("Posts loaded:", posts);
+    console.log("Posts loaded:", normalizedPosts);
     handleRoute();
     window.addEventListener("hashchange", handleRoute);
     searchInput.addEventListener("input", () => {
         clearTimeout(debounceTimer);
         debounceTimer = window.setTimeout(() => {
-            const query = searchInput.value.toLowerCase();
-            const filtered = filterPosts(query);
-            renderPostList(filtered);
+            activeSearchQuery = searchInput.value.trim().toLowerCase();
+            window.location.hash = "";
+            renderPostList(filterPosts(normalizedPosts));
         }, 300);
     });
     content.addEventListener("click", (e) => {
         const tagEl = e.target.closest(".tag");
         if (!tagEl)
             return;
+        e.preventDefault();
+        e.stopPropagation();
         const tag = tagEl.dataset.tag;
         if (!tag)
             return;
+        activeSearchQuery = "";
+        searchInput.value = "";
         window.location.hash = `tag=${encodeURIComponent(tag.trim())}`;
     });
 }
-function filterPosts(query) {
-    if (!query)
-        return sortByDate(normalizedPosts);
-    return normalizedPosts.filter((p) => p.title.toLowerCase().includes(query) ||
+function filterPosts(list) {
+    const query = activeSearchQuery;
+    if (!query) {
+        return sortByDate(list);
+    }
+    return sortByDate(list.filter((p) => p.title.toLowerCase().includes(query) ||
         p.author.toLowerCase().includes(query) ||
+        p.excerpt.toLowerCase().includes(query) ||
         p.tags.some((tag) => tag.toLowerCase().includes(query)) ||
-        p.searchWords.some((word) => word.toLowerCase().includes(query)));
+        p.searchWords.some((word) => word.toLowerCase().includes(query))));
 }
 function sortByDate(list) {
     return [...list].sort((a, b) => b.date.getTime() - a.date.getTime());
 }
+function highlightMatch(text) {
+    if (!activeSearchQuery)
+        return escapeHtml(text);
+    const escapedText = escapeHtml(text);
+    const escapedQuery = activeSearchQuery.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`(${escapedQuery})`, "gi");
+    return escapedText.replace(regex, "<mark>$1</mark>");
+}
 function renderPostList(list) {
     searchInput.style.display = "block";
+    const isTagPage = window.location.hash.startsWith("#tag=");
+    const tagName = isTagPage
+        ? decodeURIComponent(window.location.hash.replace("#tag=", ""))
+        : "";
+    const filterLabel = isTagPage
+        ? `<button class="clear-filter" id="clearTagFilter">Clear tag: #${escapeHtml(tagName)}</button>`
+        : "";
     content.innerHTML = `
+    ${filterLabel}
+
+    <div class="result-count">
+      ${list.length} post${list.length === 1 ? "" : "s"} found
+    </div>
+
     <div class="post-list">
       ${list.map(renderPostCard).join("")}
     </div>
   `;
     list.forEach((post) => {
         const el = document.getElementById(post.filename);
-        el?.addEventListener("click", () => openPost(post));
+        el?.addEventListener("click", (e) => {
+            const target = e.target;
+            if (target.closest(".tag")) {
+                return;
+            }
+            openPost(post);
+        });
+    });
+    document.getElementById("clearTagFilter")?.addEventListener("click", () => {
+        history.pushState("", document.title, window.location.pathname + window.location.search);
+        activeSearchQuery = "";
+        searchInput.value = "";
+        handleRoute();
     });
     const images = content.querySelectorAll(".post-card img");
     images.forEach((el) => {
@@ -65,34 +107,54 @@ function renderPostList(list) {
     });
 }
 function renderPostCard(post) {
+    const isActiveTag = (tag) => {
+        const hash = window.location.hash;
+        if (!hash.startsWith("#tag="))
+            return false;
+        const activeTag = decodeURIComponent(hash.replace("#tag=", ""));
+        return activeTag.toLowerCase() === tag.toLowerCase();
+    };
     return `
-    <div class="post-card" id="${post.filename}">
-      <img src="./thumbs/${post.filename.replace(".md", ".png")}" />
+    <article class="post-card" id="${escapeHtml(post.filename)}">
+      <img 
+        src="./thumbs/${escapeHtml(post.filename.replace(".md", ".png"))}" 
+        alt="${escapeHtml(post.title)} thumbnail"
+      />
+
       <div>
-        <h3>${post.title}</h3>
+        <h3>${highlightMatch(post.title)}</h3>
 
         <div class="post-meta">
-          ${post.author} • ${post.date.toDateString()} • ${post.readingTime}
+          ${highlightMatch(post.author)} • ${post.date.toDateString()} • ${escapeHtml(post.readingTime)}
         </div>
 
         <p class="post-excerpt">
-          ${post.excerpt}
+          ${highlightMatch(post.excerpt)}
         </p>
 
         <div class="tags">
-          ${post.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}
+          ${post.tags
+        .map((tag) => `
+                <span 
+                  class="tag ${isActiveTag(tag) ? "active-tag" : ""}" 
+                  data-tag="${escapeHtml(tag)}"
+                >
+                  ${highlightMatch(tag)}
+                </span>
+              `)
+        .join("")}
         </div>
       </div>
-    </div>
+    </article>
   `;
 }
 function openPost(post) {
-    window.location.hash = `post=${post.filename}`;
+    window.location.hash = `post=${encodeURIComponent(post.filename)}`;
 }
 function handleRoute() {
     const hash = window.location.hash;
     if (hash.startsWith("#post=")) {
-        const filename = hash.replace("#post=", "");
+        const filename = decodeURIComponent(hash.replace("#post=", ""));
         const post = normalizedPosts.find((p) => p.filename === filename);
         if (post) {
             void renderPost(post);
@@ -100,31 +162,38 @@ function handleRoute() {
         }
     }
     if (hash.startsWith("#tag=")) {
-        const tag = decodeURIComponent(hash.replace("#tag=", "").trim());
+        const tag = decodeURIComponent(hash.replace("#tag=", "")).trim();
         const filtered = normalizedPosts.filter((post) => post.tags.some((t) => t.trim().toLowerCase() === tag.toLowerCase()));
         searchInput.style.display = "block";
         searchInput.value = "";
-        renderPostList(filtered);
+        activeSearchQuery = "";
+        renderPostList(sortByDate(filtered));
         return;
     }
-    renderPostList(normalizedPosts);
+    renderPostList(filterPosts(normalizedPosts));
 }
 async function renderPost(post) {
     searchInput.style.display = "none";
     const markdown = await fetch(`./blogposts/${post.filename}`).then((res) => res.text());
     const html = parseMarkdown(markdown);
     content.innerHTML = `
-    <div class="back-btn" id="backBtn">← Back to Home</div>
-    <div class="post-view">
+    <button class="back-btn" id="backBtn">← Back to Home</button>
+
+    <article class="post-view">
       <h1>${escapeHtml(post.title)}</h1>
+
       <div class="post-meta">
-        ${escapeHtml(post.author)} • ${post.date.toDateString()}
+        ${escapeHtml(post.author)} • ${post.date.toDateString()} • ${escapeHtml(post.readingTime)}
       </div>
-      <div class="post-body">${html}</div>
-    </div>
+
+      ${html}
+    </article>
   `;
     document.getElementById("backBtn").addEventListener("click", () => {
-        window.location.hash = "";
+        history.pushState("", document.title, window.location.pathname + window.location.search);
+        activeSearchQuery = "";
+        searchInput.value = "";
+        handleRoute();
     });
     await renderMermaidDiagrams();
 }
@@ -133,6 +202,8 @@ function parseMarkdown(md) {
     const renderer = new markedLib.Renderer();
     renderer.image = (token) => {
         let src = token.href;
+        const alt = token.text || "";
+        const title = token.title || "";
         if (typeof src !== "string") {
             console.error("Invalid image src:", token);
             return "";
@@ -140,16 +211,22 @@ function parseMarkdown(md) {
         if (!src.startsWith("http")) {
             src = `./images/${src}`;
         }
-        return `<img src="${src}" alt="${escapeHtml(token.text || "")}" ${token.title ? `title="${escapeHtml(token.title)}"` : ""} />`;
+        return `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" title="${escapeHtml(title)}" />`;
     };
     renderer.code = (token) => {
         const lang = (token.lang || "").trim().toLowerCase();
         const code = token.text || "";
         if (lang === "mermaid") {
-            return `<pre class="mermaid">${escapeHtml(code)}</pre>`;
+            return `
+        <pre class="mermaid">
+${escapeHtml(code)}
+        </pre>
+      `;
         }
         const className = lang ? ` class="language-${escapeHtml(lang)}"` : "";
-        return `<pre><code${className}>${escapeHtml(code)}</code></pre>`;
+        return `
+      <pre><code${className}>${escapeHtml(code)}</code></pre>
+    `;
     };
     markedLib.setOptions({
         breaks: true,
@@ -184,6 +261,5 @@ function escapeHtml(value) {
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
+        .replace(/'/g, "&#039;");
 }
-init();
