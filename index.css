@@ -298,3 +298,37 @@ body {
   font-size: 14px;
   line-height: 1.65;
 }
+.result-count {
+  margin: 0 0 18px;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.clear-filter {
+  margin: 0 0 14px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: #111827;
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.clear-filter:hover {
+  background: #1e3a8a;
+}
+
+mark {
+  padding: 0 3px;
+  border-radius: 5px;
+  background: #fef3c7;
+  color: inherit;
+}
+
+.active-tag {
+  background: #2563eb;
+  color: white;
+}
