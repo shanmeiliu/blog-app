@@ -85,16 +85,28 @@ export const posts: BlogPost[] = [
     hash: "f8365bfdd56ecb379a9384c2af08e20a9c1eba97ecaadb08eab81b79b8f4fd8e"
   },
   {
-    title: "Designing Data-Intensive Applications — Applied to Modern AI & RAG Systems",
+    title: "*Designing Data-Intensive Applications* — Applied to Modern AI & RAG Systems",
     author: "Kitten",
     date: new Date(2026, 4, 6, 15, 5, 26),
-    modifiedDate: new Date(2026, 4, 6, 15, 13, 34),
+    modifiedDate: new Date(2026, 4, 8, 20, 2, 8),
     filename: "post15.md",
     tags: ["ai","rag","distributed-systems","data-engineering"],
-    searchWords: ["rag architecture","designing data-intensive applications","vector database consistency","llm data systems","semantic retrieval"],
-    excerpt: "Learn how to apply fundamental distributed systems principles from DDIA to modern RAG architectures, focusing on semantic consistency, data contracts, and indexing trade-offs.",
+    searchWords: ["rag architecture","distributed systems in ai","vector database principles","llm data contracts","semantic consistency"],
+    excerpt: "Explore how fundamental distributed systems principles from Designing Data-Intensive Applications apply to building scalable and consistent RAG and AI architectures.",
     readingTime: "4 min read",
-    hash: "7f2c35f2c1dba6d4db75ef56d68814b7095efd65f891801896a119a660121d8c"
+    hash: "e9bee3811597b6bf3a3fe5007ae7bdec0eb392b49732dfec25540f630a8ec6fa"
+  },
+  {
+    title: "pgvector vs Milvus vs Qdrant: Filtering, Permissions, and What Actually Matters in Production RAG",
+    author: "Kitten",
+    date: new Date(2026, 4, 8, 20, 2, 22),
+    modifiedDate: new Date(2026, 4, 8, 20, 2, 22),
+    filename: "post16.md",
+    tags: ["pgvector","milvus","qdrant","rag","vector-databases"],
+    searchWords: ["vector database comparison","rag filtering techniques","pgvector vs milvus","vector search security","production rag implementation"],
+    excerpt: "Evaluate the trade-offs between pgvector, Milvus, and Qdrant regarding filtering, security, and performance for building reliable, enterprise-grade RAG systems.",
+    readingTime: "5 min read",
+    hash: "78376ae858f973564cfc7a65b6630201aebb97a1a0a476e93036afdcfa90cd8e"
   },
   {
     title: "Untitled Post",
