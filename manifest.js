@@ -120,6 +120,18 @@ export const posts = [
     hash: "2b16d0095e588cab1782081aea5498149454a226224e16b6a492dfbc4ad43f31"
   },
   {
+    title: "SSE vs WebSockets in Production Systems: Streaming Architecture for Modern AI and Real-Time Applications",
+    author: "Kitten",
+    date: new Date(2026, 4, 11, 14, 5, 51),
+    modifiedDate: new Date(2026, 4, 11, 14, 5, 51),
+    filename: "post19.md",
+    tags: ["sse","websockets","streaming","architecture"],
+    searchWords: ["sse vs websockets","real-time streaming","server-sent events","web socket architecture","ai token streaming"],
+    excerpt: "Compare SSE and WebSockets to understand when to use unidirectional vs bidirectional streaming for AI-driven applications and real-time systems.",
+    readingTime: "8 min read",
+    hash: "205692abe4b70b4131bb25c860b693b76c3cb77bc10c3349b2fce1755c9a8cd9"
+  },
+  {
     title: "Untitled Post",
     author: "Kitten",
     date: new Date(2026, 4, 5, 19, 40, 56),
