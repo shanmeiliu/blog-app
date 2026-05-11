@@ -108,6 +108,18 @@ export const posts = [
     hash: "da0615f7e697b1f5850ccd31c81ce53fa0371259309ab2e1e164d7337e03e936"
   },
   {
+    title: "Rerankers in Production RAG: The Missing Layer Between Vector Search and LLM Quality",
+    author: "Kitten",
+    date: new Date(2026, 4, 11, 12, 11, 41),
+    modifiedDate: new Date(2026, 4, 11, 12, 11, 41),
+    filename: "post18.md",
+    tags: ["rag","reranking","vector search","llm"],
+    searchWords: ["rag precision","reranker vs embedding","two stage retrieval","cross-encoders","production rag"],
+    excerpt: "Learn how a two-stage retrieval architecture using rerankers improves RAG precision by bridging the gap between vector search recall and true query relevance.",
+    readingTime: "7 min read",
+    hash: "2b16d0095e588cab1782081aea5498149454a226224e16b6a492dfbc4ad43f31"
+  },
+  {
     title: "Untitled Post",
     author: "Kitten",
     date: new Date(2026, 4, 5, 19, 40, 56),
