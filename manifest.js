@@ -96,6 +96,18 @@ export const posts = [
     hash: "78376ae858f973564cfc7a65b6630201aebb97a1a0a476e93036afdcfa90cd8e"
   },
   {
+    title: "Production RAG Architecture: Why Real Systems Use Multiple Databases",
+    author: "Kitten",
+    date: new Date(2026, 4, 11, 10, 32, 7),
+    modifiedDate: new Date(2026, 4, 11, 10, 32, 7),
+    filename: "post17.md",
+    tags: ["rag","architecture","databases","scalability"],
+    searchWords: ["production rag","rag architecture","vector databases","distributed retrieval","scaling rag"],
+    excerpt: "Learn why scaling RAG systems requires moving beyond single-database prototypes toward a distributed architecture of specialized storage layers for production-grade performance.",
+    readingTime: "5 min read",
+    hash: "da0615f7e697b1f5850ccd31c81ce53fa0371259309ab2e1e164d7337e03e936"
+  },
+  {
     title: "Untitled Post",
     author: "Kitten",
     date: new Date(2026, 4, 5, 19, 40, 56),
