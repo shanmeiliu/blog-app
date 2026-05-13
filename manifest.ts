@@ -157,6 +157,18 @@ export const posts: BlogPost[] = [
     hash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   {
+    title: "Fitting Maximum Signal into a Limited Context Window",
+    author: "Kitten",
+    date: new Date(2026, 4, 12, 21, 37, 7),
+    modifiedDate: new Date(2026, 4, 12, 21, 47, 8),
+    filename: "post20.md",
+    tags: ["llm","context engineering","prompt optimization","ai"],
+    searchWords: ["context window optimization","llm performance","large codebase ai","token management","prompt engineering"],
+    excerpt: "Learn how to maximize signal-to-noise ratio in LLM prompts using context engineering, memory hierarchies, and structural compression for large codebases.",
+    readingTime: "6 min read",
+    hash: "8072dbb24c127161e44dc137edacf134863959d2b0542bd228506c6f443799cf"
+  },
+  {
     title: "Designing Robust Prompts for RAG Systems (Eliminating Hallucinations)",
     author: "Kitten",
     date: new Date(2026, 4, 5, 19, 41, 56),
