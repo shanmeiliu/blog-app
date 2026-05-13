@@ -9,6 +9,20 @@ declare global {
 
 const content = document.getElementById("content") as HTMLElement;
 const searchInput = document.getElementById("search") as HTMLInputElement;
+const searchModeSelect = document.getElementById("searchMode") as HTMLSelectElement;
+const advancedFilter = document.getElementById("advancedFilter") as HTMLElement;
+const tagSearchInput = document.getElementById("tagSearch") as HTMLInputElement;
+const selectedTagsEl = document.getElementById("selectedTags") as HTMLElement;
+const tagLettersEl = document.getElementById("tagLetters") as HTMLElement;
+const tagBrowserEl = document.getElementById("tagBrowser") as HTMLElement;
+const logicOrBtn = document.getElementById("logicOr") as HTMLButtonElement;
+const logicAndBtn = document.getElementById("logicAnd") as HTMLButtonElement;
+
+let searchMode: "default" | "advanced" = "default";
+let selectedTags: string[] = [];
+let advancedLogic: "OR" | "AND" = "OR";
+let activeTagLetter = "A";
+let tagSearchQuery = "";
 
 let debounceTimer: number | undefined;
 let mermaidInitialized = false;
@@ -43,6 +57,80 @@ function init() {
     }, 300);
   });
 
+  searchModeSelect.addEventListener("change", () => {
+  searchMode = searchModeSelect.value as "default" | "advanced";
+
+  selectedTags = [];
+  tagSearchQuery = "";
+  tagSearchInput.value = "";
+  activeSearchQuery = "";
+  searchInput.value = "";
+
+  if (searchMode === "advanced") {
+    searchInput.style.display = "none";
+    advancedFilter.classList.remove("hidden");
+    renderAdvancedFilter();
+    applyAdvancedFilter();
+  } else {
+    advancedFilter.classList.add("hidden");
+    searchInput.style.display = "block";
+    renderPostList(filterPosts(normalizedPosts));
+  }
+});
+
+logicOrBtn.addEventListener("click", () => {
+  advancedLogic = "OR";
+  logicOrBtn.classList.add("active");
+  logicAndBtn.classList.remove("active");
+  applyAdvancedFilter();
+});
+
+logicAndBtn.addEventListener("click", () => {
+  advancedLogic = "AND";
+  logicAndBtn.classList.add("active");
+  logicOrBtn.classList.remove("active");
+  applyAdvancedFilter();
+});
+
+tagSearchInput.addEventListener("input", () => {
+  tagSearchQuery = tagSearchInput.value.trim();
+  renderAdvancedFilter();
+});
+
+tagLettersEl.addEventListener("click", (e) => {
+  const button = (e.target as HTMLElement).closest(".tag-letter") as HTMLButtonElement;
+  if (!button) return;
+
+  activeTagLetter = button.dataset.letter || "A";
+  tagSearchQuery = "";
+  tagSearchInput.value = "";
+  renderAdvancedFilter();
+});
+
+tagBrowserEl.addEventListener("click", (e) => {
+  const button = (e.target as HTMLElement).closest(".filter-tag") as HTMLButtonElement;
+  if (!button) return;
+
+  const tag = button.dataset.filterTag;
+  if (!tag) return;
+
+  selectedTags = selectedTags.includes(tag)
+    ? selectedTags.filter((t) => t !== tag)
+    : [...selectedTags, tag];
+
+  applyAdvancedFilter();
+});
+
+selectedTagsEl.addEventListener("click", (e) => {
+  const button = (e.target as HTMLElement).closest(".selected-tag") as HTMLButtonElement;
+  if (!button) return;
+
+  const tag = button.dataset.removeTag;
+  if (!tag) return;
+
+  selectedTags = selectedTags.filter((t) => t !== tag);
+  applyAdvancedFilter();
+});
   content.addEventListener("click", (e) => {
     const tagEl = (e.target as HTMLElement).closest(".tag") as HTMLElement;
     if (!tagEl) return;
@@ -82,6 +170,85 @@ function sortByDate(list: BlogPost[]): BlogPost[] {
   return [...list].sort((a, b) => b.date.getTime() - a.date.getTime());
 }
 
+function getAllTags(): string[] {
+  return Array.from(
+    new Set(normalizedPosts.flatMap((post) => post.tags))
+  ).sort((a, b) => a.localeCompare(b));
+}
+
+function filterPostsByAdvancedTags(list: BlogPost[]): BlogPost[] {
+  if (selectedTags.length === 0) return sortByDate(list);
+
+  return sortByDate(
+    list.filter((post) => {
+      const postTags = post.tags.map((tag) => tag.toLowerCase());
+
+      if (advancedLogic === "AND") {
+        return selectedTags.every((tag) =>
+          postTags.includes(tag.toLowerCase())
+        );
+      }
+
+      return selectedTags.some((tag) =>
+        postTags.includes(tag.toLowerCase())
+      );
+    })
+  );
+}
+
+function renderAdvancedFilter() {
+  const allTags = getAllTags();
+
+  selectedTagsEl.innerHTML = selectedTags
+    .map(
+      (tag) => `
+        <button class="selected-tag" data-remove-tag="${escapeHtml(tag)}">
+          ${escapeHtml(tag)} ×
+        </button>
+      `
+    )
+    .join("");
+
+  const letters = Array.from(
+    new Set(allTags.map((tag) => tag[0]?.toUpperCase()).filter(Boolean))
+  );
+
+  tagLettersEl.innerHTML = letters
+    .map(
+      (letter) => `
+        <button class="tag-letter ${letter === activeTagLetter ? "active" : ""}" data-letter="${letter}">
+          ${letter}
+        </button>
+      `
+    )
+    .join("");
+
+  const visibleTags = allTags.filter((tag) => {
+    const matchesLetter = tag.toUpperCase().startsWith(activeTagLetter);
+    const matchesSearch = tag
+      .toLowerCase()
+      .includes(tagSearchQuery.toLowerCase());
+
+    return tagSearchQuery ? matchesSearch : matchesLetter;
+  });
+
+  tagBrowserEl.innerHTML = visibleTags
+    .map(
+      (tag) => `
+        <button class="filter-tag ${selectedTags.includes(tag) ? "active" : ""}" data-filter-tag="${escapeHtml(tag)}">
+          ${escapeHtml(tag)}
+        </button>
+      `
+    )
+    .join("");
+}
+
+function applyAdvancedFilter() {
+  window.location.hash = "";
+  renderPostList(filterPostsByAdvancedTags(normalizedPosts));
+  renderAdvancedFilter();
+}
+
 function highlightMatch(text: string): string {
   if (!activeSearchQuery) return escapeHtml(text);
 
@@ -93,7 +260,9 @@ function highlightMatch(text: string): string {
 }
 
 function renderPostList(list: BlogPost[]) {
-  searchInput.style.display = "block";
+  // searchInput.style.display = "block";
+  searchInput.style.display = searchMode === "default" ? "block" : "none";
+  advancedFilter.classList.toggle("hidden", searchMode !== "advanced");
 
   const isTagPage = window.location.hash.startsWith("#tag=");
   const tagName = isTagPage

@@ -1,6 +1,19 @@
 import { posts } from "./manifest.js";
 const content = document.getElementById("content");
 const searchInput = document.getElementById("search");
+const searchModeSelect = document.getElementById("searchMode");
+const advancedFilter = document.getElementById("advancedFilter");
+const tagSearchInput = document.getElementById("tagSearch");
+const selectedTagsEl = document.getElementById("selectedTags");
+const tagLettersEl = document.getElementById("tagLetters");
+const tagBrowserEl = document.getElementById("tagBrowser");
+const logicOrBtn = document.getElementById("logicOr");
+const logicAndBtn = document.getElementById("logicAnd");
+let searchMode = "default";
+let selectedTags = [];
+let advancedLogic = "OR";
+let activeTagLetter = "A";
+let tagSearchQuery = "";
 let debounceTimer;
 let mermaidInitialized = false;
 let activeSearchQuery = "";
@@ -24,6 +37,72 @@ function init() {
             window.location.hash = "";
             renderPostList(filterPosts(normalizedPosts));
         }, 300);
+    });
+    searchModeSelect.addEventListener("change", () => {
+        searchMode = searchModeSelect.value;
+        selectedTags = [];
+        tagSearchQuery = "";
+        tagSearchInput.value = "";
+        activeSearchQuery = "";
+        searchInput.value = "";
+        if (searchMode === "advanced") {
+            searchInput.style.display = "none";
+            advancedFilter.classList.remove("hidden");
+            renderAdvancedFilter();
+            applyAdvancedFilter();
+        }
+        else {
+            advancedFilter.classList.add("hidden");
+            searchInput.style.display = "block";
+            renderPostList(filterPosts(normalizedPosts));
+        }
+    });
+    logicOrBtn.addEventListener("click", () => {
+        advancedLogic = "OR";
+        logicOrBtn.classList.add("active");
+        logicAndBtn.classList.remove("active");
+        applyAdvancedFilter();
+    });
+    logicAndBtn.addEventListener("click", () => {
+        advancedLogic = "AND";
+        logicAndBtn.classList.add("active");
+        logicOrBtn.classList.remove("active");
+        applyAdvancedFilter();
+    });
+    tagSearchInput.addEventListener("input", () => {
+        tagSearchQuery = tagSearchInput.value.trim();
+        renderAdvancedFilter();
+    });
+    tagLettersEl.addEventListener("click", (e) => {
+        const button = e.target.closest(".tag-letter");
+        if (!button)
+            return;
+        activeTagLetter = button.dataset.letter || "A";
+        tagSearchQuery = "";
+        tagSearchInput.value = "";
+        renderAdvancedFilter();
+    });
+    tagBrowserEl.addEventListener("click", (e) => {
+        const button = e.target.closest(".filter-tag");
+        if (!button)
+            return;
+        const tag = button.dataset.filterTag;
+        if (!tag)
+            return;
+        selectedTags = selectedTags.includes(tag)
+            ? selectedTags.filter((t) => t !== tag)
+            : [...selectedTags, tag];
+        applyAdvancedFilter();
+    });
+    selectedTagsEl.addEventListener("click", (e) => {
+        const button = e.target.closest(".selected-tag");
+        if (!button)
+            return;
+        const tag = button.dataset.removeTag;
+        if (!tag)
+            return;
+        selectedTags = selectedTags.filter((t) => t !== tag);
+        applyAdvancedFilter();
     });
     content.addEventListener("click", (e) => {
         const tagEl = e.target.closest(".tag");
@@ -53,6 +132,57 @@ function filterPosts(list) {
 function sortByDate(list) {
     return [...list].sort((a, b) => b.date.getTime() - a.date.getTime());
 }
+function getAllTags() {
+    return Array.from(new Set(normalizedPosts.flatMap((post) => post.tags))).sort((a, b) => a.localeCompare(b));
+}
+function filterPostsByAdvancedTags(list) {
+    if (selectedTags.length === 0)
+        return sortByDate(list);
+    return sortByDate(list.filter((post) => {
+        const postTags = post.tags.map((tag) => tag.toLowerCase());
+        if (advancedLogic === "AND") {
+            return selectedTags.every((tag) => postTags.includes(tag.toLowerCase()));
+        }
+        return selectedTags.some((tag) => postTags.includes(tag.toLowerCase()));
+    }));
+}
+function renderAdvancedFilter() {
+    const allTags = getAllTags();
+    selectedTagsEl.innerHTML = selectedTags
+        .map((tag) => `
+        <button class="selected-tag" data-remove-tag="${escapeHtml(tag)}">
+          ${escapeHtml(tag)} ×
+        </button>
+      `)
+        .join("");
+    const letters = Array.from(new Set(allTags.map((tag) => tag[0]?.toUpperCase()).filter(Boolean)));
+    tagLettersEl.innerHTML = letters
+        .map((letter) => `
+        <button class="tag-letter ${letter === activeTagLetter ? "active" : ""}" data-letter="${letter}">
+          ${letter}
+        </button>
+      `)
+        .join("");
+    const visibleTags = allTags.filter((tag) => {
+        const matchesLetter = tag.toUpperCase().startsWith(activeTagLetter);
+        const matchesSearch = tag
+            .toLowerCase()
+            .includes(tagSearchQuery.toLowerCase());
+        return tagSearchQuery ? matchesSearch : matchesLetter;
+    });
+    tagBrowserEl.innerHTML = visibleTags
+        .map((tag) => `
+        <button class="filter-tag ${selectedTags.includes(tag) ? "active" : ""}" data-filter-tag="${escapeHtml(tag)}">
+          ${escapeHtml(tag)}
+        </button>
+      `)
+        .join("");
+}
+function applyAdvancedFilter() {
+    window.location.hash = "";
+    renderPostList(filterPostsByAdvancedTags(normalizedPosts));
+    renderAdvancedFilter();
+}
 function highlightMatch(text) {
     if (!activeSearchQuery)
         return escapeHtml(text);
@@ -62,7 +192,9 @@ function highlightMatch(text) {
     return escapedText.replace(regex, "<mark>$1</mark>");
 }
 function renderPostList(list) {
-    searchInput.style.display = "block";
+    // searchInput.style.display = "block";
+    searchInput.style.display = searchMode === "default" ? "block" : "none";
+    advancedFilter.classList.toggle("hidden", searchMode !== "advanced");
     const isTagPage = window.location.hash.startsWith("#tag=");
     const tagName = isTagPage
         ? decodeURIComponent(window.location.hash.replace("#tag=", ""))
