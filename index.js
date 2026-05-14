@@ -113,6 +113,14 @@ function init() {
         const tag = tagEl.dataset.tag;
         if (!tag)
             return;
+        // Reset advanced filter state when using the old tag filter
+        searchMode = "default";
+        searchModeSelect.value = "default";
+        selectedTags = [];
+        tagSearchQuery = "";
+        tagSearchInput.value = "";
+        advancedFilter.classList.add("hidden");
+        searchInput.style.display = "block";
         activeSearchQuery = "";
         searchInput.value = "";
         window.location.hash = `tag=${encodeURIComponent(tag.trim())}`;

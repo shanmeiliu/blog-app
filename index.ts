@@ -132,19 +132,29 @@ selectedTagsEl.addEventListener("click", (e) => {
   applyAdvancedFilter();
 });
   content.addEventListener("click", (e) => {
-    const tagEl = (e.target as HTMLElement).closest(".tag") as HTMLElement;
-    if (!tagEl) return;
+  const tagEl = (e.target as HTMLElement).closest(".tag") as HTMLElement;
+  if (!tagEl) return;
 
-    e.preventDefault();
-    e.stopPropagation();
+  e.preventDefault();
+  e.stopPropagation();
 
-    const tag = tagEl.dataset.tag;
-    if (!tag) return;
+  const tag = tagEl.dataset.tag;
+  if (!tag) return;
 
-    activeSearchQuery = "";
-    searchInput.value = "";
-    window.location.hash = `tag=${encodeURIComponent(tag.trim())}`;
-  });
+  // Reset advanced filter state when using the old tag filter
+  searchMode = "default";
+  searchModeSelect.value = "default";
+  selectedTags = [];
+  tagSearchQuery = "";
+  tagSearchInput.value = "";
+  advancedFilter.classList.add("hidden");
+  searchInput.style.display = "block";
+
+  activeSearchQuery = "";
+  searchInput.value = "";
+
+  window.location.hash = `tag=${encodeURIComponent(tag.trim())}`;
+});
 }
 
 function filterPosts(list: BlogPost[]): BlogPost[] {
