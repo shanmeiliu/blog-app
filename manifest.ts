@@ -169,6 +169,18 @@ export const posts: BlogPost[] = [
     hash: "8072dbb24c127161e44dc137edacf134863959d2b0542bd228506c6f443799cf"
   },
   {
+    title: "Designing Production-Grade Caching Systems for LLM Applications",
+    author: "Kitten",
+    date: new Date(2026, 4, 15, 10, 27, 19),
+    modifiedDate: new Date(2026, 4, 15, 10, 27, 19),
+    filename: "post21.md",
+    tags: ["llm","caching","architecture","ai","production"],
+    searchWords: ["llm caching strategies","semantic cache","prompt prefix caching","llm cost optimization","ai infrastructure"],
+    excerpt: "Explore multi-layer caching architectures designed to reduce LLM latency, minimize inference costs, and optimize production-grade AI infrastructure.",
+    readingTime: "8 min read",
+    hash: "ceca500205e9064885d4e94d08d2ea8a48f04b84bcc1c9470cd0dadbdc97dfb4"
+  },
+  {
     title: "Designing Robust Prompts for RAG Systems (Eliminating Hallucinations)",
     author: "Kitten",
     date: new Date(2026, 4, 5, 19, 41, 56),
