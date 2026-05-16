@@ -168,6 +168,18 @@ export const posts = [
     hash: "ceca500205e9064885d4e94d08d2ea8a48f04b84bcc1c9470cd0dadbdc97dfb4"
   },
   {
+    title: "RAG and PDF Parsing: Why It Is Still One of the Hardest Problems in Production AI Systems",
+    author: "Kitten",
+    date: new Date(2026, 4, 16, 11, 50, 27),
+    modifiedDate: new Date(2026, 4, 16, 11, 50, 27),
+    filename: "post22.md",
+    tags: ["rag","pdf","parsing","ai","data engineering"],
+    searchWords: ["pdf parsing challenges","rag pipelines","document ingestion","retrieval augmented generation","data quality"],
+    excerpt: "Discover why the rendering-first architecture of PDFs creates fundamental challenges for semantic extraction and data quality in production RAG pipelines.",
+    readingTime: "8 min read",
+    hash: "71169f951aa2f2b966b57464c3ef1747d524700d7234bb963db7848106f9ff4d"
+  },
+  {
     title: "Designing Robust Prompts for RAG Systems (Eliminating Hallucinations)",
     author: "Kitten",
     date: new Date(2026, 4, 5, 19, 41, 56),
