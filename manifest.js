@@ -180,6 +180,18 @@ export const posts = [
     hash: "71169f951aa2f2b966b57464c3ef1747d524700d7234bb963db7848106f9ff4d"
   },
   {
+    title: "LangChain, LangGraph, and the New AI Orchestration Stack: Designing Production-Grade LLM Systems",
+    author: "Kitten",
+    date: new Date(2026, 4, 22, 15, 23, 40),
+    modifiedDate: new Date(2026, 4, 22, 15, 23, 40),
+    filename: "post23.md",
+    tags: ["langchain","langgraph","ai orchestration","llm"],
+    searchWords: ["ai orchestration frameworks","langchain architecture","production llm systems","agentic workflows","llm engineering"],
+    excerpt: "Learn how AI orchestration frameworks like LangChain and LangGraph enable the design of complex, production-grade LLM systems through advanced agentic workflows.",
+    readingTime: "7 min read",
+    hash: "91da15c09d1de998436e13c8720f55511099969ad7659c94261447f4569ad243"
+  },
+  {
     title: "Designing Robust Prompts for RAG Systems (Eliminating Hallucinations)",
     author: "Kitten",
     date: new Date(2026, 4, 5, 19, 41, 56),
