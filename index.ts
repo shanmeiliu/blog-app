@@ -426,7 +426,7 @@ async function renderPost(post: BlogPost) {
     res.text()
   );
 
-  const html = parseMarkdown(markdown);
+  const html = parseMarkdown(stripDuplicateTitle(markdown, post.title));
 
   content.innerHTML = `
     <button class="back-btn" id="backBtn">← Back to Home</button>
@@ -531,6 +531,25 @@ async function renderMermaidDiagrams() {
   } catch (error) {
     console.error("Failed to render Mermaid diagram(s):", error);
   }
+}
+
+function stripDuplicateTitle(markdown: string, title: string): string {
+  const lines = markdown.split("\n");
+  const firstMeaningfulLineIndex = lines.findIndex((line) => line.trim());
+
+  if (firstMeaningfulLineIndex === -1) return markdown;
+
+  const firstLine = lines[firstMeaningfulLineIndex].trim();
+  const normalizedTitle = title.trim().toLowerCase();
+
+  if (
+    firstLine.startsWith("# ") &&
+    firstLine.replace(/^#\s+/, "").trim().toLowerCase() === normalizedTitle
+  ) {
+    lines.splice(firstMeaningfulLineIndex, 1);
+  }
+
+  return lines.join("\n").trimStart();
 }
 
 function escapeHtml(value: string): string {
