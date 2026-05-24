@@ -336,6 +336,7 @@ async function renderPost(post) {
         handleRoute();
     });
     await renderMermaidDiagrams();
+    initDiagramZoomControls();
     initCodeCopyButtons();
 }
 function parseMarkdown(md) {
@@ -398,6 +399,60 @@ async function renderMermaidDiagrams() {
     catch (error) {
         console.error("Failed to render Mermaid diagram(s):", error);
     }
+}
+function initDiagramZoomControls() {
+    const diagrams = content.querySelectorAll(".mermaid svg");
+    diagrams.forEach((svg) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "diagram-zoom-wrapper";
+        const toolbar = document.createElement("div");
+        toolbar.className = "diagram-zoom-toolbar";
+        toolbar.innerHTML = `
+  <button type="button" title="Zoom out" data-action="zoom-out">−</button>
+  <span class="diagram-zoom-level">100%</span>
+  <button type="button" title="Zoom in" data-action="zoom-in">+</button>
+  <button type="button" title="Reset view" data-action="reset">↺</button>
+`;
+        svg.parentElement?.insertBefore(wrapper, svg);
+        wrapper.appendChild(toolbar);
+        wrapper.appendChild(svg);
+        const panzoom = Panzoom(svg, {
+            maxScale: 6,
+            minScale: 0.2,
+            step: 0.2,
+            contain: "none",
+            canvas: true,
+        });
+        panzoom.zoom(0.6);
+        const zoomLevel = toolbar.querySelector(".diagram-zoom-level");
+        const updateZoomLevel = () => {
+            const scale = panzoom.getScale();
+            zoomLevel.textContent = `${Math.round(scale * 100)}%`;
+        };
+        wrapper.addEventListener("wheel", (event) => {
+            event.preventDefault();
+            panzoom.zoomWithWheel(event);
+            updateZoomLevel();
+        });
+        wrapper.addEventListener("panzoomchange", updateZoomLevel);
+        wrapper.addEventListener("dblclick", () => {
+            panzoom.reset();
+            updateZoomLevel();
+        });
+        toolbar.querySelector('[data-action="zoom-in"]')?.addEventListener("click", () => {
+            panzoom.zoomIn();
+            updateZoomLevel();
+        });
+        toolbar.querySelector('[data-action="zoom-out"]')?.addEventListener("click", () => {
+            panzoom.zoomOut();
+            updateZoomLevel();
+        });
+        toolbar.querySelector('[data-action="reset"]')?.addEventListener("click", () => {
+            panzoom.reset();
+            updateZoomLevel();
+        });
+        updateZoomLevel();
+    });
 }
 function stripDuplicateTitle(markdown, title) {
     const lines = markdown.split("\n");
