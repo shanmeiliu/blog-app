@@ -336,6 +336,7 @@ async function renderPost(post) {
         handleRoute();
     });
     await renderMermaidDiagrams();
+    initCodeCopyButtons();
 }
 function parseMarkdown(md) {
     const markedLib = window.marked;
@@ -365,8 +366,11 @@ ${escapeHtml(code)}
         }
         const className = lang ? ` class="language-${escapeHtml(lang)}"` : "";
         return `
-      <pre><code${className}>${escapeHtml(code)}</code></pre>
-    `;
+  <div class="code-block-wrapper">
+    <button class="copy-code-btn" type="button">Copy</button>
+    <pre><code${className}>${escapeHtml(code)}</code></pre>
+  </div>
+`;
     };
     markedLib.setOptions({
         breaks: true,
@@ -407,6 +411,22 @@ function stripDuplicateTitle(markdown, title) {
         lines.splice(firstMeaningfulLineIndex, 1);
     }
     return lines.join("\n").trimStart();
+}
+function initCodeCopyButtons() {
+    const buttons = content.querySelectorAll(".copy-code-btn");
+    buttons.forEach((button) => {
+        button.addEventListener("click", async () => {
+            const wrapper = button.closest(".code-block-wrapper");
+            const code = wrapper?.querySelector("code")?.textContent || "";
+            if (!code)
+                return;
+            await navigator.clipboard.writeText(code);
+            button.textContent = "Copied!";
+            window.setTimeout(() => {
+                button.textContent = "Copy";
+            }, 1200);
+        });
+    });
 }
 function escapeHtml(value) {
     return value
