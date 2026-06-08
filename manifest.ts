@@ -205,6 +205,18 @@ export const posts: BlogPost[] = [
     hash: "91da15c09d1de998436e13c8720f55511099969ad7659c94261447f4569ad243"
   },
   {
+    title: "Beyond RAG: The Technology Behind Tavily, Brave Search, and LLM-Aware Search Engines",
+    author: "Kitten",
+    date: new Date(2026, 5, 8, 11, 43, 12),
+    modifiedDate: new Date(2026, 5, 8, 11, 43, 12),
+    filename: "post24.md",
+    tags: ["llm","search","rag","ai-infrastructure"],
+    searchWords: ["llm search engines","tavily","brave search","hybrid retrieval","ai agents"],
+    excerpt: "An exploration of the architecture behind LLM-aware search engines, detailing query expansion, hybrid retrieval, and content extraction techniques for AI agents.",
+    readingTime: "4 min read",
+    hash: "e11998f5d02f8933606db1af382bc45c98ed8995fe5897e89b533ad7cb349520"
+  },
+  {
     title: "Designing Robust Prompts for RAG Systems (Eliminating Hallucinations)",
     author: "Kitten",
     date: new Date(2026, 4, 5, 19, 41, 56),
