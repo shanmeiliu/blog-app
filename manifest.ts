@@ -217,6 +217,18 @@ export const posts: BlogPost[] = [
     hash: "e11998f5d02f8933606db1af382bc45c98ed8995fe5897e89b533ad7cb349520"
   },
   {
+    title: "From Subagents to Agent Teams: Two Collaboration Patterns in Multi-Agent Systems",
+    author: "Kitten",
+    date: new Date(2026, 5, 14, 9, 47, 44),
+    modifiedDate: new Date(2026, 5, 14, 9, 47, 44),
+    filename: "post25.md",
+    tags: ["ai agents","multi-agent systems","agent collaboration"],
+    searchWords: ["multi-agent systems","subagents vs agent teams","ai task delegation","context management","agentic workflows"],
+    excerpt: "Explore how subagents and agent teams solve context window overload in multi-agent systems through effective task delegation and specialized collaboration patterns.",
+    readingTime: "7 min read",
+    hash: "cc04d0a2ec46ee096fe1df7495730976f1157300fb4bbc69ae1aaf4a2b037463"
+  },
+  {
     title: "Designing Robust Prompts for RAG Systems (Eliminating Hallucinations)",
     author: "Kitten",
     date: new Date(2026, 4, 5, 19, 41, 56),
