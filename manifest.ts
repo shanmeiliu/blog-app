@@ -229,6 +229,18 @@ export const posts: BlogPost[] = [
     hash: "cc04d0a2ec46ee096fe1df7495730976f1157300fb4bbc69ae1aaf4a2b037463"
   },
   {
+    title: "From Ollama to the Cloud: Migrating Local LLM Infrastructure to AWS Bedrock, SageMaker, Google Cloud Vertex AI, and Azure AI",
+    author: "Kitten",
+    date: new Date(2026, 5, 25, 13, 46, 14),
+    modifiedDate: new Date(2026, 5, 25, 13, 46, 14),
+    filename: "post26.md",
+    tags: ["llm","cloud migration","ollama","ai infrastructure"],
+    searchWords: ["llm migration","ollama to aws","managed ai services","gpu scaling","ai deployment"],
+    excerpt: "Explore the transition from local Ollama-based LLM setups to scalable managed cloud platforms like AWS Bedrock, SageMaker, and Google Cloud Vertex AI.",
+    readingTime: "5 min read",
+    hash: "f55228784e278b843dae28686fa314791813e3b09c200ebd7898a3e7c4a8920b"
+  },
+  {
     title: "Designing Robust Prompts for RAG Systems (Eliminating Hallucinations)",
     author: "Kitten",
     date: new Date(2026, 4, 5, 19, 41, 56),
